@@ -77,7 +77,7 @@ const extendedTestimonials = [...testimonials, ...testimonials, ...testimonials]
 
 export function Testimonials() {
     return (
-        <section className="py-20 bg-white border-y border-black/5 overflow-hidden">
+        <section className="py-20 bg-[#FAFAF9] overflow-hidden">
             {/* Header */}
             <div className="max-w-7xl mx-auto px-4 text-center mb-16">
                 <h2 className="font-heading font-bold text-4xl md:text-5xl mb-4">
@@ -144,7 +144,7 @@ export function Testimonials() {
 // Testimonial Card Component
 function TestimonialCard({ testimonial }: { testimonial: typeof testimonials[0] }) {
     return (
-        <div className="flex-shrink-0 w-[380px] bg-[#FAFAF9] p-6 rounded-2xl border border-black/5 shadow-sm">
+        <div className="flex-shrink-0 w-[380px] bg-white p-6 rounded-2xl border border-black/5 shadow-sm">
             {/* Stars */}
             <div className="flex gap-1 mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (

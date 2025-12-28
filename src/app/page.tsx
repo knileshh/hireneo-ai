@@ -5,6 +5,7 @@ import { Hero } from '@/components/landing/hero';
 import { FeaturesBento } from '@/components/landing/features-bento';
 import { Testimonials } from '@/components/landing/testimonials';
 import { FAQ } from '@/components/landing/faq';
+import { Pricing } from '@/components/landing/pricing';
 import { Footer } from '@/components/landing/footer';
 
 export default function HomePage() {
@@ -16,6 +17,7 @@ export default function HomePage() {
                 <Hero />
                 <FeaturesBento />
                 <Testimonials />
+                <Pricing />
                 <FAQ />
             </main>
 
