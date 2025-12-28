@@ -18,8 +18,12 @@ import {
     CheckCircle2,
     Loader2,
     Sparkles,
-    ClipboardList
+    ClipboardList,
+    Link2,
+    Copy,
+    ExternalLink
 } from 'lucide-react';
+import { useState } from 'react';
 
 // Types
 type Interview = {
@@ -45,11 +49,23 @@ type Question = {
     question: string;
     category: string;
     difficulty: string;
+    timeLimit?: number;
 };
 
 type InterviewQuestions = {
     id: string;
     questions: Question[];
+};
+
+type AssessmentToken = {
+    token: string;
+    assessmentUrl: string;
+    expiresAt: string;
+    usedAt?: string;
+    completedAt?: string;
+    isExpired?: boolean;
+    isUsed?: boolean;
+    isCompleted?: boolean;
 };
 
 type Scorecard = {
@@ -81,6 +97,13 @@ const fetchScorecard = async (id: string): Promise<Scorecard | null> => {
     return res.json();
 };
 
+const fetchAssessmentToken = async (id: string): Promise<AssessmentToken | null> => {
+    const res = await fetch(`/api/interviews/${id}/assessment-token`);
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error('Failed to fetch assessment token');
+    return res.json();
+};
+
 export default function InterviewDetailPage() {
     const params = useParams();
     const router = useRouter();
@@ -108,6 +131,13 @@ export default function InterviewDetailPage() {
         queryKey: ['scorecard', id],
         queryFn: () => fetchScorecard(id),
     });
+
+    const { data: assessmentToken, refetch: refetchAssessmentToken } = useQuery({
+        queryKey: ['assessmentToken', id],
+        queryFn: () => fetchAssessmentToken(id),
+    });
+
+    const [copied, setCopied] = useState(false);
 
     // Mutations
     const generateQuestionsMutation = useMutation({
@@ -150,6 +180,24 @@ export default function InterviewDetailPage() {
         },
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ['interview', id] }),
     });
+
+    const generateAssessmentMutation = useMutation({
+        mutationFn: async () => {
+            const res = await fetch(`/api/interviews/${id}/assessment-token`, { method: 'POST' });
+            if (!res.ok) throw new Error('Failed to generate assessment link');
+            return res.json();
+        },
+        onSuccess: () => refetchAssessmentToken(),
+    });
+
+    const copyAssessmentLink = () => {
+        if (assessmentToken) {
+            const fullUrl = `${window.location.origin}${assessmentToken.assessmentUrl}`;
+            navigator.clipboard.writeText(fullUrl);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
 
     if (isLoading) {
         return (
@@ -245,6 +293,84 @@ export default function InterviewDetailPage() {
                     </div>
                 )}
             </div>
+
+            {/* Assessment Link Card */}
+            {questions && (
+                <div className="bg-gradient-to-r from-[#1A3305] to-[#2D5A10] rounded-3xl p-8 shadow-sm text-white">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                            <h2 className="text-xl font-bold font-heading mb-1 flex items-center gap-2">
+                                <Link2 className="w-5 h-5" />
+                                Candidate Assessment Link
+                            </h2>
+                            <p className="text-white/70 text-sm">
+                                Share this link with the candidate to complete their timed assessment
+                            </p>
+                        </div>
+
+                        {assessmentToken ? (
+                            <div className="flex items-center gap-2">
+                                <div className="bg-white/10 rounded-xl px-4 py-2 text-sm font-mono truncate max-w-[300px]">
+                                    {window.location.origin}{assessmentToken.assessmentUrl}
+                                </div>
+                                <Button
+                                    onClick={copyAssessmentLink}
+                                    variant="secondary"
+                                    size="sm"
+                                    className="bg-white/20 hover:bg-white/30 text-white border-0"
+                                >
+                                    {copied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                </Button>
+                                <a
+                                    href={assessmentToken.assessmentUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        className="bg-white/20 hover:bg-white/30 text-white border-0"
+                                    >
+                                        <ExternalLink className="w-4 h-4" />
+                                    </Button>
+                                </a>
+                            </div>
+                        ) : (
+                            <Button
+                                onClick={() => generateAssessmentMutation.mutate()}
+                                disabled={generateAssessmentMutation.isPending}
+                                className="bg-white text-[#1A3305] hover:bg-white/90"
+                            >
+                                {generateAssessmentMutation.isPending ? (
+                                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                ) : (
+                                    <Link2 className="w-4 h-4 mr-2" />
+                                )}
+                                Generate Assessment Link
+                            </Button>
+                        )}
+                    </div>
+
+                    {assessmentToken && (
+                        <div className="mt-4 flex flex-wrap gap-4 text-sm">
+                            {assessmentToken.isCompleted ? (
+                                <span className="flex items-center gap-1 text-green-300">
+                                    <CheckCircle2 className="w-4 h-4" /> Completed
+                                </span>
+                            ) : assessmentToken.isUsed ? (
+                                <span className="flex items-center gap-1 text-yellow-300">
+                                    <Loader2 className="w-4 h-4" /> In Progress
+                                </span>
+                            ) : (
+                                <span className="text-white/60">Not started yet</span>
+                            )}
+                            <span className="text-white/60">
+                                Expires: {new Date(assessmentToken.expiresAt).toLocaleDateString()}
+                            </span>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Scorecard Summary */}
             {scorecard && (
