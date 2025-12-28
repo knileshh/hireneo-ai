@@ -84,7 +84,7 @@ export function FAQ() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1 }}
-                            className="border-b border-dashed border-black/20 last:border-0"
+                            className="border-b-2 border-dashed border-black/30 last:border-0"
                         >
                             <button
                                 onClick={() => toggleFAQ(faq.id)}
