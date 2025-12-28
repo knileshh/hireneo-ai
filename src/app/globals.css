@@ -23,12 +23,14 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  
+
+  /* Custom Pastel Palette for "Skillora" Vibe */
+  --color-cream: var(--cream);
+  --color-surface-yellow: var(--surface-yellow);
+  --color-surface-purple: var(--surface-purple);
+  --color-surface-green: var(--surface-green);
+  --color-surface-pink: var(--surface-pink);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -38,98 +40,127 @@
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-heading: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-handwriting: var(--font-handwriting), cursive;
 }
 
-/* 
-  Premium AI Dark Mode 
-  Base: Slate 950 (#020617)
-  Primary: Violet/Indigo 
-*/
-
 :root {
-  --radius: 0.75rem;
+  --radius: 1rem;
+  /* Rounded-2xl/3xl feel */
 
-  /* Light Theme - clean, techy */
-  --background: oklch(0.985 0 0);      /* Slate 50 */
-  --foreground: oklch(0.13 0.028 261.692); /* Slate 900 */
-  
+  /* Light Theme - Cream/Pastel Aesthetic */
+  --background: oklch(0.98 0.01 85);
+  /* Warm Cream White */
+  --foreground: oklch(0.15 0.05 85);
+  /* Deep Warm Grey */
+
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.13 0.028 261.692);
-  
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.13 0.028 261.692);
-  
-  --primary: oklch(0.47 0.22 285.8);   /* Violet 600 - High vibrance */
-  --primary-foreground: oklch(0.985 0 0);
-  
-  --secondary: oklch(0.95 0.01 261.692); /* Slate 100 */
-  --secondary-foreground: oklch(0.25 0.03 261.692);
-  
-  --muted: oklch(0.95 0.01 261.692);
-  --muted-foreground: oklch(0.45 0.03 261.692); /* Slate 500 */
-  
-  --accent: oklch(0.93 0.02 261.692);
-  --accent-foreground: oklch(0.25 0.03 261.692);
-  
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  
-  --border: oklch(0.9 0.02 261.692);   /* Slate 200 */
-  --input: oklch(0.9 0.02 261.692);
-  --ring: oklch(0.47 0.22 285.8);      /* Matches Primary */
+  --card-foreground: oklch(0.15 0.05 85);
 
-  --chart-1: oklch(0.47 0.22 285.8);
-  --chart-2: oklch(0.5 0.2 245.8);
-  --chart-3: oklch(0.4 0.2 300.8);
-  --chart-4: oklch(0.6 0.15 285.8);
-  --chart-5: oklch(0.7 0.1 285.8);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.05 85);
+
+  --primary: oklch(0.25 0.1 130);
+  /* Dark Green (from reference footer/section) */
+  --primary-foreground: oklch(0.98 0.01 85);
+
+  --secondary: oklch(0.95 0.04 85);
+  /* Light Beige */
+  --secondary-foreground: oklch(0.25 0.05 85);
+
+  --muted: oklch(0.96 0.02 85);
+  --muted-foreground: oklch(0.55 0.05 85);
+
+  --accent: oklch(0.92 0.05 85);
+  --accent-foreground: oklch(0.25 0.05 85);
+
+  --destructive: oklch(0.6 0.25 25);
+  --destructive-foreground: oklch(0.98 0 0);
+
+  --border: oklch(0.9 0.02 85);
+  --input: oklch(0.9 0.02 85);
+  --ring: oklch(0.25 0.1 130);
+
+  /* Specific Brand Colors from Reference */
+  --cream: oklch(0.97 0.02 85);
+  /* Main background */
+  --surface-yellow: oklch(0.94 0.15 95);
+  /* Bright Yellow Cards */
+  --surface-purple: oklch(0.92 0.08 280);
+  /* Lilac Cards */
+  --surface-green: oklch(0.95 0.1 140);
+  /* Mint Cards */
+  --surface-pink: oklch(0.92 0.1 340);
+  /* Pink Cards */
+
+  /* Chart Colors */
+  --chart-1: oklch(0.65 0.2 130);
+  --chart-2: oklch(0.6 0.2 280);
+  --chart-3: oklch(0.7 0.2 95);
+  --chart-4: oklch(0.65 0.2 340);
+  --chart-5: oklch(0.7 0.15 200);
 }
 
 .dark {
-  /* Dark Theme - Premium "Deep Slate" */
-  --background: oklch(0.11 0.02 261.692); /* Slate 950 - Deepest Blue-Grey */
-  --foreground: oklch(0.96 0.01 261.692); /* Slate 50 */
-  
-  --card: oklch(0.13 0.02 261.692);       /* Slate 900/950 hybrid */
-  --card-foreground: oklch(0.96 0.01 261.692);
-  
-  --popover: oklch(0.13 0.02 261.692);
-  --popover-foreground: oklch(0.96 0.01 261.692);
-  
-  --primary: oklch(0.65 0.25 285.8);     /* Violet 400 - Electric glow */
-  --primary-foreground: oklch(0.11 0.02 261.692);
-  
-  --secondary: oklch(0.2 0.04 261.692);  /* Slate 800 */
-  --secondary-foreground: oklch(0.96 0.01 261.692);
-  
-  --muted: oklch(0.2 0.04 261.692);
-  --muted-foreground: oklch(0.65 0.04 261.692); /* Slate 400 */
-  
-  --accent: oklch(0.2 0.04 261.692);
-  --accent-foreground: oklch(0.96 0.01 261.692);
-  
-  --destructive: oklch(0.35 0.15 20.0);
-  --destructive-foreground: oklch(0.96 0.01 261.692);
-  
-  --border: oklch(0.22 0.04 261.692);    /* Slate 800 */
-  --input: oklch(0.22 0.04 261.692);
-  --ring: oklch(0.65 0.25 285.8);
-  
-  --chart-1: oklch(0.65 0.25 285.8);
-  --chart-2: oklch(0.6 0.2 245.8);
-  --chart-3: oklch(0.5 0.2 300.8);
-  --chart-4: oklch(0.7 0.15 285.8);
-  --chart-5: oklch(0.8 0.1 285.8);
+  /* Dark Theme - Deep Forest/Charcoal */
+  --background: oklch(0.12 0.03 130);
+  /* Deep Forest Green/Black */
+  --foreground: oklch(0.98 0.01 85);
+  /* Cream White */
+
+  --card: oklch(0.15 0.04 130);
+  --card-foreground: oklch(0.98 0.01 85);
+
+  --popover: oklch(0.15 0.04 130);
+  --popover-foreground: oklch(0.98 0.01 85);
+
+  --primary: oklch(0.85 0.15 95);
+  /* Bright Yellow Accent */
+  --primary-foreground: oklch(0.15 0.05 85);
+
+  --secondary: oklch(0.2 0.05 130);
+  --secondary-foreground: oklch(0.98 0.01 85);
+
+  --muted: oklch(0.2 0.05 130);
+  --muted-foreground: oklch(0.7 0.05 130);
+
+  --accent: oklch(0.2 0.05 130);
+  --accent-foreground: oklch(0.98 0.01 85);
+
+  --destructive: oklch(0.5 0.2 25);
+  --destructive-foreground: oklch(0.98 0 0);
+
+  --border: oklch(0.25 0.05 130);
+  --input: oklch(0.25 0.05 130);
+  --ring: oklch(0.85 0.15 95);
+
+  /* Pastels in Dark Mode (Desaturated/Tinted) */
+  --cream: oklch(0.12 0.03 130);
+  --surface-yellow: oklch(0.25 0.1 95);
+  --surface-purple: oklch(0.25 0.08 280);
+  --surface-green: oklch(0.25 0.1 140);
+  --surface-pink: oklch(0.25 0.1 340);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground font-sans;
   }
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-heading tracking-tight;
+  }
+
+  /* Custom utility to resemble paper/cards */
+  .card-premium {
+    @apply rounded-3xl border border-black/5 shadow-sm overflow-hidden;
   }
 }

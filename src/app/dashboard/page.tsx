@@ -66,39 +66,32 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-muted-foreground hover:text-foreground">
-              ← Home
-            </Link>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-              <p className="text-muted-foreground">
-                Interview Orchestration
-              </p>
-            </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight font-heading">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Overview of your hiring pipeline
+            </p>
           </div>
-          <div className="flex items-center gap-4">
-            <CreateInterviewDialog>
-              <Button size="lg">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M5 12h14" />
-                  <path d="M12 5v14" />
-                </svg>
-                New Interview
-              </Button>
-            </CreateInterviewDialog>
-            <UserButton afterSignOutUrl="/" />
-          </div>
+          <CreateInterviewDialog>
+            <Button size="lg" className="shadow-lg shadow-primary/20">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mr-2"
+              >
+                <path d="M5 12h14" />
+                <path d="M12 5v14" />
+              </svg>
+              New Interview
+            </Button>
+          </CreateInterviewDialog>
         </div>
 
         {/* Stats Cards */}

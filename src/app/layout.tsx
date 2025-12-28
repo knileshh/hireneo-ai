@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import { ClerkProvider } from '@clerk/nextjs';
 import { Providers } from './providers';
-import { Inter, Outfit } from 'next/font/google';
+import { Inter, Outfit, Caveat } from 'next/font/google';
 import './globals.css';
 
 // Font configuration
@@ -12,10 +12,15 @@ const inter = Inter({
   display: 'swap',
 });
 
-// Outfit is a great free alternative to Gilroy
 const outfit = Outfit({
   subsets: ['latin'],
   variable: '--font-outfit',
+  display: 'swap',
+});
+
+const caveat = Caveat({
+  subsets: ['latin'],
+  variable: '--font-handwriting',
   display: 'swap',
 });
 
@@ -36,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${inter.variable} ${outfit.variable} dark`}>
+      <html lang="en" className={`${inter.variable} ${outfit.variable} ${caveat.variable} light`}>
         <head>
           {/* Microsoft Clarity Analytics */}
           <Script id="clarity-script" strategy="afterInteractive">
