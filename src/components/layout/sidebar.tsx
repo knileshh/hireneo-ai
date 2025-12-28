@@ -43,7 +43,7 @@ export function Sidebar() {
     return (
         <div className="flex bg-card h-full w-64 flex-col border-r">
             <div className="p-6">
-                <Link href="/" className="flex items-center gap-2 font-heading font-bold text-xl text-primary">
+                <Link href="/" className="flex items-center gap-2 font-heading font-bold text-xl text-[#1A3305]">
                     <BrainCircuit className="h-6 w-6" />
                     <span>HireNeo AI</span>
                 </Link>
@@ -56,8 +56,10 @@ export function Sidebar() {
                             <Button
                                 variant={pathname === item.href ? 'secondary' : 'ghost'}
                                 className={cn(
-                                    'w-full justify-start gap-3',
-                                    pathname === item.href && 'bg-primary/10 text-primary hover:bg-primary/20'
+                                    'w-full justify-start gap-3 rounded-xl font-medium',
+                                    pathname === item.href
+                                        ? 'bg-[#FEF08A] text-black hover:bg-[#FDE047]' // Active: Yellow
+                                        : 'text-gray-600 hover:bg-gray-100 hover:text-black'
                                 )}
                             >
                                 <item.icon className="h-4 w-4" />
