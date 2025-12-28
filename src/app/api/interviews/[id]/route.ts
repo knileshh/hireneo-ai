@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { interviews } from '@/lib/db/schema';
+import { interviews, interviewQuestions, scorecards, evaluations } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { transitionStatus } from '@/lib/domain/interview-state-machine';
 import { logger } from '@/lib/logger';
@@ -122,7 +122,7 @@ export async function PATCH(
 
 /**
  * DELETE /api/interviews/[id]
- * Delete an interview
+ * Delete an interview and all related data
  */
 export async function DELETE(
     req: NextRequest,
@@ -142,9 +142,15 @@ export async function DELETE(
             );
         }
 
+        // Delete related records first (cascade manually since DB constraints might restrict it)
+        await db.delete(interviewQuestions).where(eq(interviewQuestions.interviewId, id));
+        await db.delete(scorecards).where(eq(scorecards.interviewId, id));
+        await db.delete(evaluations).where(eq(evaluations.interviewId, id));
+
+        // Finally delete the interview
         await db.delete(interviews).where(eq(interviews.id, id));
 
-        logger.info({ interviewId: id }, 'Interview deleted');
+        logger.info({ interviewId: id }, 'Interview and related data deleted');
 
         return NextResponse.json({ success: true, id });
 
