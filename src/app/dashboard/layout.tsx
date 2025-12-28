@@ -1,4 +1,5 @@
 import { Sidebar } from '@/components/layout/sidebar';
+import { HiringAssistantChat } from '@/components/chat/hiring-assistant';
 
 export default function DashboardLayout({
     children,
@@ -18,6 +19,9 @@ export default function DashboardLayout({
                     {children}
                 </div>
             </main>
+
+            {/* AI Hiring Assistant */}
+            <HiringAssistantChat />
         </div>
     );
 }
