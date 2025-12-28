@@ -45,62 +45,44 @@ const testimonials = [
         avatar: "https://i.pravatar.cc/150?img=9",
         rating: 5,
         text: "Love the instant AI evaluations. We can now give candidates feedback within 24 hours instead of weeks."
-    }
+    },
+    {
+        id: 6,
+        name: "Alex Thompson",
+        role: "Recruiter @ Airbnb",
+        avatar: "https://i.pravatar.cc/150?img=7",
+        rating: 5,
+        text: "This platform streamlined our entire interview process. The question bank alone is worth the subscription."
+    },
+    {
+        id: 7,
+        name: "Lisa Park",
+        role: "VP Talent @ Uber",
+        avatar: "https://i.pravatar.cc/150?img=10",
+        rating: 5,
+        text: "Reduced our time-to-hire by 50%. The AI insights are incredibly accurate and helpful."
+    },
+    {
+        id: 8,
+        name: "James Wilson",
+        role: "Founder @ StartupX",
+        avatar: "https://i.pravatar.cc/150?img=14",
+        rating: 5,
+        text: "Best investment for our hiring process. The scorecards keep everyone aligned on candidate evaluation."
+    },
 ];
 
-export function Testimonials() {
-    const averageRating = 4.9;
-    const totalUsers = "34,198+";
+// Duplicate testimonials for seamless infinite scroll
+const extendedTestimonials = [...testimonials, ...testimonials];
 
+export function Testimonials() {
     return (
-        <section className="py-20 px-4 bg-white border-y border-black/5">
+        <section className="py-20 px-4 bg-white border-y border-black/5 overflow-hidden">
             <div className="max-w-7xl mx-auto">
 
-                {/* Header with Social Proof */}
+                {/* Header */}
                 <div className="text-center mb-16">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="inline-flex items-center gap-3 mb-4"
-                    >
-                        {/* Avatar Stack */}
-                        <div className="flex -space-x-2">
-                            {testimonials.slice(0, 5).map((testimonial, i) => (
-                                <div
-                                    key={testimonial.id}
-                                    className="relative w-10 h-10 rounded-full border-2 border-white overflow-hidden shadow-md"
-                                    style={{ zIndex: 5 - i }}
-                                >
-                                    <Image
-                                        src={testimonial.avatar}
-                                        alt={testimonial.name}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Rating */}
-                        <div className="flex items-center gap-2">
-                            <div className="flex">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                    <Star
-                                        key={star}
-                                        className="w-5 h-5 fill-[#FDE047] text-[#FDE047]"
-                                    />
-                                ))}
-                            </div>
-                            <span className="font-bold text-lg">{averageRating}/5.0</span>
-                        </div>
-                    </motion.div>
-
-                    <p className="text-muted-foreground text-sm">
-                        Used by <span className="font-bold text-foreground">{totalUsers} people</span>
-                    </p>
-
-                    <h2 className="font-heading font-bold text-4xl md:text-5xl mt-8 mb-4">
+                    <h2 className="font-heading font-bold text-4xl md:text-5xl mb-4">
                         Loved by{' '}
                         <span className="relative inline-block">
                             <span className="relative z-10">hiring teams</span>
@@ -112,48 +94,87 @@ export function Testimonials() {
                     </p>
                 </div>
 
-                {/* Testimonials Grid */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {testimonials.map((testimonial, index) => (
-                        <motion.div
-                            key={testimonial.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.1 }}
-                            className="bg-[#FAFAF9] p-6 rounded-2xl border border-black/5 hover:shadow-md transition-shadow"
-                        >
-                            {/* Stars */}
-                            <div className="flex gap-1 mb-4">
-                                {[...Array(testimonial.rating)].map((_, i) => (
-                                    <Star key={i} className="w-4 h-4 fill-[#FDE047] text-[#FDE047]" />
-                                ))}
-                            </div>
+                {/* Scrolling Marquee - Row 1 (Left to Right) */}
+                <div className="relative mb-6">
+                    <div className="flex gap-6 animate-marquee">
+                        {extendedTestimonials.slice(0, 8).map((testimonial, index) => (
+                            <TestimonialCard key={`row1-${testimonial.id}-${index}`} testimonial={testimonial} />
+                        ))}
+                    </div>
+                </div>
 
-                            {/* Testimonial Text */}
-                            <p className="text-foreground/80 mb-6 leading-relaxed">
-                                "{testimonial.text}"
-                            </p>
-
-                            {/* Author */}
-                            <div className="flex items-center gap-3">
-                                <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm">
-                                    <Image
-                                        src={testimonial.avatar}
-                                        alt={testimonial.name}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                </div>
-                                <div>
-                                    <p className="font-bold text-sm">{testimonial.name}</p>
-                                    <p className="text-muted-foreground text-xs">{testimonial.role}</p>
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
+                {/* Scrolling Marquee - Row 2 (Right to Left) */}
+                <div className="relative">
+                    <div className="flex gap-6 animate-marquee-reverse">
+                        {extendedTestimonials.slice(0, 8).reverse().map((testimonial, index) => (
+                            <TestimonialCard key={`row2-${testimonial.id}-${index}`} testimonial={testimonial} />
+                        ))}
+                    </div>
                 </div>
             </div>
+
+            <style jsx>{`
+        @keyframes marquee {
+          0% {
+            transform: translateX(0%);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+
+        @keyframes marquee-reverse {
+          0% {
+            transform: translateX(-50%);
+          }
+          100% {
+            transform: translateX(0%);
+          }
+        }
+
+        .animate-marquee {
+          animation: marquee 40s linear infinite;
+        }
+
+        .animate-marquee-reverse {
+          animation: marquee-reverse 40s linear infinite;
+        }
+      `}</style>
         </section>
+    );
+}
+
+// Testimonial Card Component
+function TestimonialCard({ testimonial }: { testimonial: typeof testimonials[0] }) {
+    return (
+        <div className="flex-shrink-0 w-[380px] bg-[#FAFAF9] p-6 rounded-2xl border border-black/5 shadow-sm">
+            {/* Stars */}
+            <div className="flex gap-1 mb-4">
+                {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-[#FDE047] text-[#FDE047]" />
+                ))}
+            </div>
+
+            {/* Testimonial Text */}
+            <p className="text-foreground/80 mb-6 leading-relaxed text-sm">
+                "{testimonial.text}"
+            </p>
+
+            {/* Author */}
+            <div className="flex items-center gap-3">
+                <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                    <Image
+                        src={testimonial.avatar}
+                        alt={testimonial.name}
+                        fill
+                        className="object-cover"
+                    />
+                </div>
+                <div>
+                    <p className="font-bold text-sm">{testimonial.name}</p>
+                    <p className="text-muted-foreground text-xs">{testimonial.role}</p>
+                </div>
+            </div>
+        </div>
     );
 }
