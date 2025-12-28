@@ -13,26 +13,35 @@ export function Pricing() {
             <div className="max-w-7xl mx-auto relative z-10">
                 <div className="text-center mb-16">
                     <h2 className="font-heading text-4xl md:text-5xl font-bold mb-4">
-                        Plans for every <span className="text-[#1A3305]">trajectory</span>
+                        Simple pricing for <span className="text-[#1A3305]">smart hiring</span>
                     </h2>
                     <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                        Start small or scale up. Choose the trajectory that fits your hiring velocity.
+                        Choose the plan that fits your recruitment needs. No hidden fees.
                     </p>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto items-end">
 
-                    {/* Tier 1: Orbital (Free) */}
+                    {/* Tier 1: Starter (Free) */}
                     <div className="relative group h-full">
-                        {/* Abstract Orb - Blue/Slate */}
-                        <div className="absolute -top-10 -left-6 w-32 h-32 z-0 opacity-40 transition-transform duration-700 group-hover:scale-110">
-                            <div className="w-full h-full rounded-full bg-slate-300 blur-[40px]"></div>
-                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-slate-200 to-transparent blur-[20px]"></div>
+                        {/* Abstract Orb - Blue/Slate - Added Glow */}
+                        <div className="absolute -top-10 -left-6 w-32 h-32 z-0 opacity-60 transition-transform duration-700 group-hover:scale-110">
+                            <div className="w-full h-full rounded-full bg-slate-200 blur-[40px]"></div>
+                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-200 to-transparent blur-[30px] opacity-70"></div>
                         </div>
 
-                        <div className="relative z-10 bg-white/60 backdrop-blur-xl border border-white/50 rounded-[2rem] p-6 shadow-lg hover:shadow-xl transition-all duration-300 max-w-sm mx-auto w-full">
-                            <div className="mb-6">
-                                <h3 className="font-heading text-xl font-bold mb-1 text-slate-700">Orbital</h3>
+                        {/* Abstract Orb - Yellow/Gold (Added for symmetry) - MOVED TO LEFT */}
+                        <div className="absolute -bottom-8 -left-6 w-24 h-24 z-0 opacity-40 transition-transform duration-700 group-hover:scale-110 delay-100">
+                            <div className="w-full h-full rounded-full bg-orange-200 blur-[40px]"></div>
+                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-yellow-100 to-transparent blur-[20px]"></div>
+                        </div>
+
+                        <div className="relative z-10 bg-white p-6 rounded-[2rem] border border-black/5 shadow-lg hover:shadow-xl transition-all duration-300 max-w-sm mx-auto w-full overflow-hidden">
+                            {/* Shine Effect */}
+                            <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent z-20 pointer-events-none"></div>
+
+                            <div className="mb-6 relative z-30">
+                                <h3 className="font-heading text-xl font-bold mb-1 text-slate-700">Starter</h3>
                                 <div className="flex items-baseline gap-1">
                                     <span className="text-4xl font-bold tracking-tight">$0</span>
                                     <span className="text-sm text-muted-foreground">/ month</span>
@@ -40,7 +49,7 @@ export function Pricing() {
                                 <p className="text-sm text-muted-foreground mt-2">Perfect for trying out AI interviews.</p>
                             </div>
 
-                            <div className="space-y-3 mb-8">
+                            <div className="space-y-3 mb-8 relative z-30">
                                 {[
                                     "2 Active Job Roles",
                                     "10 AI Interviews / mo",
@@ -56,29 +65,32 @@ export function Pricing() {
                                 ))}
                             </div>
 
-                            <Button variant="outline" className="w-full bg-white hover:bg-slate-50 border-slate-200 text-slate-900 h-10 rounded-xl text-sm font-medium transition-transform hover:scale-[1.02]">
+                            <Button variant="outline" className="w-full bg-white hover:bg-slate-50 border-slate-200 text-slate-900 h-10 rounded-xl text-sm font-medium transition-transform hover:scale-[1.02] relative z-30">
                                 Start Free
                             </Button>
                         </div>
                     </div>
 
-                    {/* Tier 2: Stellar (Pro) - Highlight */}
+                    {/* Tier 2: Growth (Pro) - Highlight */}
                     <div className="relative group scale-105 z-20">
-                        {/* Abstract Orb - Green/Primary */}
-                        <div className="absolute -top-12 -right-8 w-40 h-40 z-0 opacity-50 transition-transform duration-700 group-hover:scale-110">
-                            <div className="w-full h-full rounded-full bg-[#1A3305] blur-[50px]"></div>
-                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#4ade80] to-transparent blur-[30px] opacity-60"></div>
+                        {/* Abstract Orb - Green/Primary - REDUCED DARKNESS */}
+                        <div className="absolute -top-12 -right-8 w-40 h-40 z-0 opacity-40 transition-transform duration-700 group-hover:scale-110">
+                            <div className="w-full h-full rounded-full bg-[#1A3305]/60 blur-[50px]"></div>
+                            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-green-300 to-transparent blur-[30px] opacity-60"></div>
                         </div>
 
-                        <div className="relative z-10 bg-white/80 backdrop-blur-2xl border-2 border-[#1A3305]/10 rounded-[2rem] p-8 shadow-2xl hover:shadow-[0_20px_40px_rgba(26,51,5,0.1)] transition-all duration-300 max-w-sm mx-auto w-full">
-                            <div className="absolute top-0 right-0 p-4">
+                        <div className="relative z-10 bg-white p-8 rounded-[2rem] border-2 border-[#1A3305]/10 shadow-2xl hover:shadow-[0_20px_40px_rgba(26,51,5,0.1)] transition-all duration-300 max-w-sm mx-auto w-full overflow-hidden">
+                            {/* Shine Effect */}
+                            <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/50 to-transparent z-20 pointer-events-none"></div>
+
+                            <div className="absolute top-0 right-0 p-4 z-30">
                                 <span className="bg-[#1A3305]/10 text-[#1A3305] text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-[#1A3305]/20">
                                     Popular
                                 </span>
                             </div>
 
-                            <div className="mb-8">
-                                <h3 className="font-heading text-2xl font-bold mb-1 text-[#1A3305]">Stellar</h3>
+                            <div className="mb-8 relative z-30">
+                                <h3 className="font-heading text-2xl font-bold mb-1 text-[#1A3305]">Growth</h3>
                                 <div className="flex items-baseline gap-1">
                                     <span className="text-5xl font-bold tracking-tight">$49</span>
                                     <span className="text-sm text-muted-foreground">/ month</span>
@@ -86,7 +98,7 @@ export function Pricing() {
                                 <p className="text-sm text-muted-foreground mt-2">For growing teams and startups.</p>
                             </div>
 
-                            <div className="space-y-4 mb-8">
+                            <div className="space-y-4 mb-8 relative z-30">
                                 {[
                                     "10 Active Job Roles",
                                     "100 AI Interviews / mo",
@@ -103,13 +115,13 @@ export function Pricing() {
                                 ))}
                             </div>
 
-                            <Button className="w-full bg-[#1A3305] hover:bg-[#1A3305]/90 text-white h-12 rounded-xl text-base font-bold shadow-lg shadow-[#1A3305]/20 transition-transform hover:scale-[1.02]">
+                            <Button className="w-full bg-[#1A3305] hover:bg-[#1A3305]/90 text-white h-12 rounded-xl text-base font-bold shadow-lg shadow-[#1A3305]/20 transition-transform hover:scale-[1.02] relative z-30">
                                 Launch Journey
                             </Button>
                         </div>
                     </div>
 
-                    {/* Tier 3: Galactic (Scale) */}
+                    {/* Tier 3: Business (Scale) */}
                     <div className="relative group h-full">
                         {/* Abstract Orb - Gold/Yellow */}
                         <div className="absolute -bottom-8 -right-6 w-36 h-36 z-0 opacity-40 transition-transform duration-700 group-hover:scale-110">
@@ -117,9 +129,12 @@ export function Pricing() {
                             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-yellow-200 to-transparent blur-[20px]"></div>
                         </div>
 
-                        <div className="relative z-10 bg-white/60 backdrop-blur-xl border border-white/50 rounded-[2rem] p-6 shadow-lg hover:shadow-xl transition-all duration-300 max-w-sm mx-auto w-full">
-                            <div className="mb-6">
-                                <h3 className="font-heading text-xl font-bold mb-1 text-slate-800">Galactic</h3>
+                        <div className="relative z-10 bg-white p-6 rounded-[2rem] border border-black/5 shadow-lg hover:shadow-xl transition-all duration-300 max-w-sm mx-auto w-full overflow-hidden">
+                            {/* Shine Effect */}
+                            <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent z-20 pointer-events-none"></div>
+
+                            <div className="mb-6 relative z-30">
+                                <h3 className="font-heading text-xl font-bold mb-1 text-slate-800">Business</h3>
                                 <div className="flex items-baseline gap-1">
                                     <span className="text-4xl font-bold tracking-tight">$149</span>
                                     <span className="text-sm text-muted-foreground">/ month</span>
@@ -127,7 +142,7 @@ export function Pricing() {
                                 <p className="text-sm text-muted-foreground mt-2">Power for agencies & volume.</p>
                             </div>
 
-                            <div className="space-y-3 mb-8">
+                            <div className="space-y-3 mb-8 relative z-30">
                                 {[
                                     "Unlimited Job Roles",
                                     "500 AI Interviews / mo",
@@ -144,7 +159,7 @@ export function Pricing() {
                                 ))}
                             </div>
 
-                            <Button variant="outline" className="w-full bg-white hover:bg-slate-50 border-slate-200 text-slate-900 h-10 rounded-xl text-sm font-medium transition-transform hover:scale-[1.02]">
+                            <Button variant="outline" className="w-full bg-white hover:bg-slate-50 border-slate-200 text-slate-900 h-10 rounded-xl text-sm font-medium transition-transform hover:scale-[1.02] relative z-30">
                                 Contact Sales
                             </Button>
                         </div>
