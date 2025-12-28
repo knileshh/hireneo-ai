@@ -7,6 +7,9 @@
  * Usage: tsx scripts/worker.ts
  */
 
+// Load environment variables FIRST (Next.js does this automatically, but tsx doesn't)
+import 'dotenv/config';
+
 import '../src/lib/queue/workers/email.worker';
 import '../src/lib/queue/workers/evaluation.worker';
 
