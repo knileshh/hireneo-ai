@@ -47,7 +47,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${inter.variable} ${outfit.variable} ${caveat.variable} ${syne.variable} light`}>
+      <html lang="en" className={`${inter.variable} ${outfit.variable} ${caveat.variable} ${syne.variable} light`} suppressHydrationWarning>
         <head>
           {/* Microsoft Clarity Analytics */}
           <Script id="clarity-script" strategy="afterInteractive">
@@ -60,7 +60,7 @@ export default function RootLayout({
             `}
           </Script>
         </head>
-        <body className="antialiased min-h-screen bg-background font-sans">
+        <body className="antialiased min-h-screen bg-background font-sans" suppressHydrationWarning>
           <Providers>{children}</Providers>
         </body>
       </html>

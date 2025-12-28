@@ -18,6 +18,7 @@ import { Label } from '@/components/ui/label';
 interface ScorecardDialogProps {
     interviewId: string;
     children: React.ReactNode;
+    existingScorecard?: Scorecard | null;
 }
 
 interface Scorecard {
@@ -64,31 +65,41 @@ function ScoreSelector({
     );
 }
 
-export function ScorecardDialog({ interviewId, children }: ScorecardDialogProps) {
+export function ScorecardDialog({ interviewId, children, existingScorecard }: ScorecardDialogProps) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [scorecard, setScorecard] = useState<Scorecard>({});
     const queryClient = useQueryClient();
 
-    // Load existing scorecard
+    // Load existing scorecard from prop or fetch
     useEffect(() => {
         if (open) {
-            fetch(`/api/interviews/${interviewId}/scorecard`)
-                .then(res => res.ok ? res.json() : null)
-                .then(data => {
-                    if (data) {
-                        setScorecard({
-                            technicalScore: data.technicalScore,
-                            communicationScore: data.communicationScore,
-                            cultureFitScore: data.cultureFitScore,
-                            problemSolvingScore: data.problemSolvingScore,
-                            notes: data.notes,
-                        });
-                    }
-                })
-                .catch(() => { });
+            if (existingScorecard) {
+                setScorecard({
+                    technicalScore: existingScorecard.technicalScore,
+                    communicationScore: existingScorecard.communicationScore,
+                    cultureFitScore: existingScorecard.cultureFitScore,
+                    problemSolvingScore: existingScorecard.problemSolvingScore,
+                    notes: existingScorecard.notes,
+                });
+            } else {
+                fetch(`/api/interviews/${interviewId}/scorecard`)
+                    .then(res => res.ok ? res.json() : null)
+                    .then(data => {
+                        if (data) {
+                            setScorecard({
+                                technicalScore: data.technicalScore,
+                                communicationScore: data.communicationScore,
+                                cultureFitScore: data.cultureFitScore,
+                                problemSolvingScore: data.problemSolvingScore,
+                                notes: data.notes,
+                            });
+                        }
+                    })
+                    .catch(() => { });
+            }
         }
-    }, [open, interviewId]);
+    }, [open, interviewId, existingScorecard]);
 
     const handleSubmit = async () => {
         setLoading(true);

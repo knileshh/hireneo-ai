@@ -36,7 +36,9 @@ type Interview = {
 const fetchInterviews = async () => {
   const res = await fetch('/api/interviews');
   if (!res.ok) throw new Error('Failed to fetch interviews');
-  return res.json() as Promise<Interview[]>;
+  const response = await res.json();
+  // API returns { data: Interview[], pagination: {...} }
+  return response.data as Interview[];
 };
 
 // Custom Card Component for Bento feel
@@ -180,13 +182,11 @@ export default function DashboardPage() {
                         )}
                       </td>
                       <td className="py-4 pr-4 text-right">
-                        <div className="invisible group-hover:visible">
-                          <Link href={`/dashboard/interview/${interview.id}`}>
-                            <Button size="sm" variant="outline" className="rounded-full h-8 px-4 bg-white hover:bg-[#FEF08A] hover:border-[#FEF08A] hover:text-black border-gray-200">
-                              View Details
-                            </Button>
-                          </Link>
-                        </div>
+                        <Link href={`/dashboard/interview/${interview.id}`}>
+                          <Button size="sm" variant="outline" className="rounded-full h-8 px-4 bg-white hover:bg-[#FEF08A] hover:border-[#FEF08A] hover:text-black border-gray-200">
+                            View Details
+                          </Button>
+                        </Link>
                       </td>
                     </tr>
                   ))}
