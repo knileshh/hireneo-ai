@@ -23,11 +23,9 @@ export async function GET(
     const { id } = await params;
 
     try {
+        // Fetch interview
         const interview = await db.query.interviews.findFirst({
             where: eq(interviews.id, id),
-            with: {
-                evaluation: true,
-            },
         });
 
         if (!interview) {
@@ -37,7 +35,15 @@ export async function GET(
             );
         }
 
-        return NextResponse.json(interview);
+        // Fetch evaluation separately
+        const evaluation = await db.query.evaluations.findFirst({
+            where: eq(evaluations.interviewId, id),
+        });
+
+        return NextResponse.json({
+            ...interview,
+            evaluation: evaluation || null,
+        });
 
     } catch (error) {
         logger.error({ interviewId: id, err: error }, 'Failed to fetch interview');

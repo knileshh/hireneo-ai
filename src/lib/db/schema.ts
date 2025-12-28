@@ -132,11 +132,37 @@ export const interviewsRelations = relations(interviews, ({ one, many }) => ({
         fields: [interviews.jobId],
         references: [jobs.id]
     }),
-    questions: one(interviewQuestions),
     responses: many(candidateResponses),
-    scorecard: one(scorecards),
-    evaluation: one(evaluations),
-    assessmentToken: one(assessmentTokens)
+    // These are "reverse" one-to-one relations (FK is on the other table)
+    // Drizzle infers them from the other side's relations
+}));
+
+export const interviewQuestionsRelations = relations(interviewQuestions, ({ one }) => ({
+    interview: one(interviews, {
+        fields: [interviewQuestions.interviewId],
+        references: [interviews.id]
+    })
+}));
+
+export const scorecardsRelations = relations(scorecards, ({ one }) => ({
+    interview: one(interviews, {
+        fields: [scorecards.interviewId],
+        references: [interviews.id]
+    })
+}));
+
+export const evaluationsRelations = relations(evaluations, ({ one }) => ({
+    interview: one(interviews, {
+        fields: [evaluations.interviewId],
+        references: [interviews.id]
+    })
+}));
+
+export const assessmentTokensRelations = relations(assessmentTokens, ({ one }) => ({
+    interview: one(interviews, {
+        fields: [assessmentTokens.interviewId],
+        references: [interviews.id]
+    })
 }));
 
 export const candidateResponsesRelations = relations(candidateResponses, ({ one }) => ({

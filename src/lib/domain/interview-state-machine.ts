@@ -1,6 +1,7 @@
 export type InterviewStatus =
     | 'CREATED'
     | 'SCHEDULED'
+    | 'IN_PROGRESS'
     | 'COMPLETED'
     | 'EVALUATION_PENDING'
     | 'EVALUATED';
@@ -8,7 +9,8 @@ export type InterviewStatus =
 // Valid state transitions (explicit state machine)
 const VALID_TRANSITIONS: Record<InterviewStatus, InterviewStatus[]> = {
     CREATED: ['SCHEDULED'],
-    SCHEDULED: ['COMPLETED'],
+    SCHEDULED: ['IN_PROGRESS', 'COMPLETED'], // Can go directly to COMPLETED or through IN_PROGRESS
+    IN_PROGRESS: ['COMPLETED'], // Candidate finishes assessment
     COMPLETED: ['EVALUATION_PENDING'],
     EVALUATION_PENDING: ['EVALUATED'],
     EVALUATED: [] // Terminal state
