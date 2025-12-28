@@ -35,6 +35,8 @@ export function CreateInterviewDialog({ children }: CreateInterviewDialogProps) 
             candidateEmail: formData.get('candidateEmail') as string,
             interviewerEmail: formData.get('interviewerEmail') as string,
             scheduledAt: new Date(formData.get('scheduledAt') as string).toISOString(),
+            jobRole: formData.get('jobRole') as string || undefined,
+            jobLevel: formData.get('jobLevel') as string || undefined,
             notes: formData.get('notes') as string || undefined,
         };
 
@@ -59,12 +61,12 @@ export function CreateInterviewDialog({ children }: CreateInterviewDialogProps) 
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
                         <DialogTitle>Schedule New Interview</DialogTitle>
                         <DialogDescription>
-                            Create a new interview. The candidate will receive a confirmation email.
+                            Create a new interview. AI will generate tailored questions based on the job role.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
@@ -97,6 +99,31 @@ export function CreateInterviewDialog({ children }: CreateInterviewDialogProps) 
                                 required
                             />
                         </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="jobRole">Job Role</Label>
+                                <Input
+                                    id="jobRole"
+                                    name="jobRole"
+                                    placeholder="Frontend Developer"
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="jobLevel">Level</Label>
+                                <select
+                                    id="jobLevel"
+                                    name="jobLevel"
+                                    className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                >
+                                    <option value="">Select level...</option>
+                                    <option value="junior">Junior</option>
+                                    <option value="mid">Mid-level</option>
+                                    <option value="senior">Senior</option>
+                                    <option value="lead">Lead</option>
+                                    <option value="manager">Manager</option>
+                                </select>
+                            </div>
+                        </div>
                         <div className="grid gap-2">
                             <Label htmlFor="scheduledAt">Scheduled Date & Time</Label>
                             <Input
@@ -111,7 +138,7 @@ export function CreateInterviewDialog({ children }: CreateInterviewDialogProps) 
                             <Input
                                 id="notes"
                                 name="notes"
-                                placeholder="Interview notes..."
+                                placeholder="Any additional notes..."
                             />
                         </div>
                     </div>

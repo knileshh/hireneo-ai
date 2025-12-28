@@ -14,6 +14,8 @@ const createInterviewSchema = z.object({
     scheduledAt: z.string().datetime('Valid ISO datetime required'),
     meetingLink: z.string().url().optional(),
     notes: z.string().optional(),
+    jobRole: z.string().optional(),
+    jobLevel: z.enum(['junior', 'mid', 'senior', 'lead', 'manager']).optional(),
 });
 
 const listInterviewsSchema = z.object({
@@ -48,6 +50,8 @@ export async function POST(req: NextRequest) {
                 status: 'CREATED',
                 meetingLink: validated.meetingLink,
                 notes: validated.notes,
+                jobRole: validated.jobRole,
+                jobLevel: validated.jobLevel,
             })
             .returning();
 
