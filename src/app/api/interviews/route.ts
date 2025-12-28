@@ -17,8 +17,8 @@ const createInterviewSchema = z.object({
 });
 
 const listInterviewsSchema = z.object({
-    page: z.coerce.number().int().positive().default(1),
-    limit: z.coerce.number().int().positive().max(100).default(20),
+    page: z.coerce.number().int().positive().optional().default(1),
+    limit: z.coerce.number().int().positive().max(100).optional().default(20),
     search: z.string().optional(),
     status: z.enum(['CREATED', 'SCHEDULED', 'COMPLETED', 'EVALUATION_PENDING', 'EVALUATED']).optional(),
 });
@@ -101,12 +101,20 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
     try {
         const { searchParams } = req.url ? new URL(req.url) : { searchParams: new URLSearchParams() };
-        const validated = listInterviewsSchema.parse({
-            page: searchParams.get('page'),
-            limit: searchParams.get('limit'),
-            search: searchParams.get('search'),
-            status: searchParams.get('status'),
-        });
+
+        // Build params object, filtering out null values
+        const params: Record<string, string> = {};
+        const page = searchParams.get('page');
+        const limit = searchParams.get('limit');
+        const search = searchParams.get('search');
+        const status = searchParams.get('status');
+
+        if (page) params.page = page;
+        if (limit) params.limit = limit;
+        if (search) params.search = search;
+        if (status) params.status = status;
+
+        const validated = listInterviewsSchema.parse(params);
 
         const offset = (validated.page - 1) * validated.limit;
 
