@@ -1,9 +1,9 @@
 'use client';
 
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // Placeholder for the "paper like" illustrations
 const PaperIllustration = ({ className, rotate = 0 }: { className?: string, rotate?: number }) => (
@@ -66,6 +66,53 @@ export function Hero() {
                     Configure custom interview questions, integrate with your ATS via webhooks,
                     and get comprehensive performance analysis on every candidate.
                 </p>
+
+                {/* Social Proof Banner */}
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="flex items-center justify-center gap-4 mb-8"
+                >
+                    {/* Avatar Stack */}
+                    <div className="flex -space-x-2">
+                        {[1, 5, 9, 12, 13].map((img, i) => (
+                            <div
+                                key={img}
+                                className="relative w-10 h-10 rounded-full border-2 border-white overflow-hidden shadow-md bg-gray-100"
+                                style={{ zIndex: 5 - i }}
+                            >
+                                <Image
+                                    src={`https://i.pravatar.cc/150?img=${img}`}
+                                    alt="User"
+                                    fill
+                                    className="object-cover"
+                                />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Rating */}
+                    <div className="flex items-center gap-2">
+                        <div className="flex">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <svg key={star} className="w-5 h-5 fill-[#FDE047] text-[#FDE047]" viewBox="0 0 24 24">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                </svg>
+                            ))}
+                        </div>
+                        <span className="font-bold text-base">4.9/5.0</span>
+                    </div>
+                </motion.div>
+
+                <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.7 }}
+                    className="text-muted-foreground text-sm mb-8"
+                >
+                    Used by <span className="font-bold text-foreground">34,198+ people</span>
+                </motion.p>
 
                 {/* Buttons */}
                 <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
