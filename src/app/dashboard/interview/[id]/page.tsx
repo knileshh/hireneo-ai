@@ -87,9 +87,16 @@ export default function InterviewDetailPage() {
     const queryClient = useQueryClient();
     const id = params.id as string;
 
-    const { data: interview, isLoading } = useQuery({
+    const { data: interview, isLoading, refetch: refetchInterview } = useQuery({
         queryKey: ['interview', id],
         queryFn: () => fetchInterview(id),
+        // Poll every 2 seconds when waiting for evaluation to complete
+        refetchInterval: (query) => {
+            const data = query.state.data;
+            // Poll while evaluation is pending or if status is EVALUATION_PENDING
+            if (data?.status === 'EVALUATION_PENDING') return 2000;
+            return false;
+        },
     });
 
     const { data: questions } = useQuery({

@@ -117,7 +117,7 @@ export function Hero() {
                         </div>
                         <span className="font-bold">4.9/5.0</span>
                         <span className="text-muted-foreground">·</span>
-                        <span className="text-muted-foreground">Used by <span className="font-bold text-foreground">34,198+</span></span>
+                        <span className="text-muted-foreground">Used by <span className="font-bold text-foreground">12,198+</span></span>
                     </div>
                 </motion.div>
 
