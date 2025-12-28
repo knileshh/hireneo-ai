@@ -122,8 +122,8 @@ export function Footer() {
                 </div>
 
                 {/* Large Watermark */}
-                <div className="relative w-full overflow-hidden pb-0 leading-none">
-                    <h2 className="font-heading font-bold text-[13vw] text-[#1A3305] opacity-20 text-center uppercase tracking-tighter leading-[0.8]">
+                <div className="relative w-full overflow-hidden mt-12">
+                    <h2 className="font-heading font-black text-[15.5vw] text-[#1A3305] opacity-20 text-center uppercase tracking-tighter leading-[0.75] w-full select-none">
                         HireNeoAI
                     </h2>
                 </div>
