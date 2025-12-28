@@ -2,150 +2,176 @@ import { Resend } from 'resend';
 import { env } from '@/lib/env';
 import { logger } from '@/lib/logger';
 
+const resend = new Resend(env.RESEND_API_KEY);
+
 /**
- * Custom error class for Resend-specific failures
+ * Custom error class for Resend-specific errors
  */
 export class ResendError extends Error {
-    constructor(
-        message: string,
-        public statusCode?: number,
-        public originalError?: unknown
-    ) {
-        super(message);
-        this.name = 'ResendError';
-    }
+  constructor(
+    message: string,
+    public statusCode?: number,
+    public originalError?: unknown
+  ) {
+    super(message);
+    this.name = 'ResendError';
+  }
+}
+
+interface SendInterviewConfirmationParams {
+  to: string;
+  candidateName: string;
+  interviewerEmail: string;
+  scheduledAt: Date;
+  meetingLink?: string;
 }
 
 /**
- * Resend client wrapper with error handling and logging
+ * Resend client wrapper with error handling and templating
  */
-export class ResendClient {
-    private resend: Resend;
+export const resendClient = {
+  /**
+   * Send interview confirmation email to candidate
+   */
+  async sendInterviewConfirmation(params: SendInterviewConfirmationParams) {
+    const { to, candidateName, interviewerEmail, scheduledAt, meetingLink } = params;
 
-    constructor() {
-        this.resend = new Resend(env.RESEND_API_KEY);
+    logger.info({
+      to,
+      candidateName,
+      scheduledAt: scheduledAt.toISOString(),
+    }, 'Sending interview confirmation email');
+
+    try {
+      const result = await resend.emails.send({
+        from: 'HireNeo AI <noreply@hireneo.ai>',
+        to: [to],
+        subject: `Interview Scheduled - ${scheduledAt.toLocaleDateString()}`,
+        html: generateInterviewEmailHtml({
+          candidateName,
+          interviewerEmail,
+          scheduledAt,
+          meetingLink,
+        }),
+      });
+
+      if (result.error) {
+        throw new ResendError(
+          result.error.message,
+          undefined,
+          result.error
+        );
+      }
+
+      logger.info({
+        emailId: result.data?.id,
+        to,
+      }, 'Interview confirmation email sent successfully');
+
+      return result;
+
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logger.error({
+        to,
+        candidateName,
+        error: errorMessage,
+      }, 'Failed to send interview confirmation email');
+
+      // Handle specific Resend errors
+      if (error instanceof ResendError) {
+        throw error;
+      }
+
+      // Check for rate limiting
+      if (errorMessage.includes('rate limit')) {
+        throw new ResendError(
+          'Email rate limit exceeded. Please try again later.',
+          429,
+          error
+        );
+      }
+
+      // Check for invalid API key
+      if (errorMessage.includes('API key')) {
+        throw new ResendError(
+          'Invalid Resend API key. Please check your configuration.',
+          401,
+          error
+        );
+      }
+
+      throw new ResendError(
+        `Failed to send email: ${errorMessage}`,
+        500,
+        error
+      );
     }
+  },
+};
 
-    /**
-     * Send interview confirmation email
-     */
-    async sendInterviewConfirmation(params: {
-        to: string;
-        candidateName: string;
-        interviewerEmail: string;
-        scheduledAt: Date;
-        meetingLink?: string;
-    }) {
-        const { to, candidateName, interviewerEmail, scheduledAt, meetingLink } = params;
+/**
+ * Generate HTML template for interview confirmation email
+ */
+function generateInterviewEmailHtml(params: {
+  candidateName: string;
+  interviewerEmail: string;
+  scheduledAt: Date;
+  meetingLink?: string;
+}): string {
+  const { candidateName, interviewerEmail, scheduledAt, meetingLink } = params;
 
-        try {
-            logger.info('Sending interview confirmation email', {
-                to,
-                candidateName,
-                scheduledAt: scheduledAt.toISOString()
-            });
-
-            const result = await this.resend.emails.send({
-                from: 'HireNeo AI <interviews@hireneo.ai>',
-                to,
-                subject: `Interview Scheduled - ${scheduledAt.toLocaleDateString()}`,
-                html: this.generateConfirmationEmail({
-                    candidateName,
-                    interviewerEmail,
-                    scheduledAt,
-                    meetingLink
-                })
-            });
-
-            logger.info('Interview confirmation email sent successfully', {
-                emailId: result.data?.id,
-                to
-            });
-
-            return result;
-
-        } catch (error: any) {
-            // Map Resend errors to internal error types
-            if (error.statusCode === 429) {
-                logger.error('Resend rate limit exceeded', { to });
-                throw new ResendError('Rate limit exceeded', 429, error);
-            }
-
-            if (error.statusCode === 401 || error.statusCode === 403) {
-                logger.error('Resend authentication failed - check API key');
-                throw new ResendError('Authentication failed', error.statusCode, error);
-            }
-
-            logger.error('Failed to send interview confirmation email', {
-                error: error.message,
-                to,
-                statusCode: error.statusCode
-            });
-
-            throw new ResendError(
-                `Email send failed: ${error.message}`,
-                error.statusCode,
-                error
-            );
-        }
-    }
-
-    /**
-     * Generate HTML email template for interview confirmation
-     */
-    private generateConfirmationEmail(params: {
-        candidateName: string;
-        interviewerEmail: string;
-        scheduledAt: Date;
-        meetingLink?: string;
-    }): string {
-        const { candidateName, interviewerEmail, scheduledAt, meetingLink } = params;
-
-        return `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: #4F46E5; color: white; padding: 20px; border-radius: 8px 8px 0 0; }
-            .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
-            .button { display: inline-block; padding: 12px 24px; background: #4F46E5; color: white; text-decoration: none; border-radius: 6px; margin-top: 20px; }
-            .details { background: white; padding: 20px; border-radius: 6px; margin: 20px 0; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Interview Confirmed</h1>
-            </div>
-            <div class="content">
-              <p>Hi ${candidateName},</p>
-              <p>Your interview has been successfully scheduled!</p>
-              
-              <div class="details">
-                <h3>Interview Details</h3>
-                <p><strong>Date & Time:</strong> ${scheduledAt.toLocaleString()}</p>
-                <p><strong>Interviewer:</strong> ${interviewerEmail}</p>
-                ${meetingLink ? `<p><strong>Meeting Link:</strong> <a href="${meetingLink}">${meetingLink}</a></p>` : ''}
-              </div>
-              
-              <p>We're looking forward to speaking with you!</p>
-              
-              ${meetingLink ? `<a href="${meetingLink}" class="button">Join Meeting</a>` : ''}
-              
-              <p style="margin-top: 30px; font-size: 14px; color: #666;">
-                Best regards,<br>
-                The HireNeo AI Team
-              </p>
-            </div>
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Interview Scheduled</title>
+      </head>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 30px; border-radius: 12px 12px 0 0;">
+          <h1 style="color: white; margin: 0; font-size: 24px;">Interview Scheduled</h1>
+        </div>
+        <div style="background: #f8fafc; padding: 30px; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0; border-top: none;">
+          <p style="font-size: 16px; color: #334155; margin-top: 0;">Hello ${candidateName},</p>
+          <p style="font-size: 16px; color: #334155;">Your interview has been scheduled!</p>
+          
+          <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0;">
+            <p style="margin: 0 0 10px 0; color: #64748b; font-size: 14px;">Date & Time</p>
+            <p style="margin: 0; color: #0f172a; font-size: 18px; font-weight: 600;">
+              ${scheduledAt.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })} at ${scheduledAt.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })}
+            </p>
           </div>
-        </body>
-      </html>
-    `;
-    }
+          
+          <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0;">
+            <p style="margin: 0 0 10px 0; color: #64748b; font-size: 14px;">Interviewer</p>
+            <p style="margin: 0; color: #0f172a; font-size: 16px;">${interviewerEmail}</p>
+          </div>
+          
+          ${meetingLink ? `
+          <a href="${meetingLink}" style="display: inline-block; background: #6366f1; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 10px;">
+            Join Meeting
+          </a>
+          ` : ''}
+          
+          <p style="font-size: 14px; color: #64748b; margin-top: 30px;">
+            If you have any questions, please reach out to your interviewer at ${interviewerEmail}.
+          </p>
+          
+          <p style="font-size: 14px; color: #94a3b8; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+            Sent by HireNeo AI
+          </p>
+        </div>
+      </body>
+    </html>
+  `;
 }
-
-// Export singleton instance
-export const resendClient = new ResendClient();

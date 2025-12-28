@@ -32,10 +32,10 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const validated = createInterviewSchema.parse(body);
 
-        logger.info('Creating new interview', {
+        logger.info({
             candidateName: validated.candidateName,
             candidateEmail: validated.candidateEmail,
-        });
+        }, 'Creating new interview');
 
         // Insert interview into database
         const [interview] = await db
@@ -72,9 +72,7 @@ export async function POST(req: NextRequest) {
             .where(eq(interviews.id, interview.id))
             .returning();
 
-        logger.info('Interview created and email queued', {
-            interviewId: interview.id,
-        });
+        logger.info({ interviewId: interview.id }, 'Interview created and email queued');
 
         return NextResponse.json(updatedInterview, { status: 201 });
 
@@ -86,7 +84,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        logger.error('Failed to create interview', { error });
+        logger.error({ err: error }, 'Failed to create interview');
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
@@ -128,11 +126,11 @@ export async function GET(req: NextRequest) {
                     like(interviews.candidateName, `%${validated.search}%`),
                     like(interviews.candidateEmail, `%${validated.search}%`)
                 )
-            );
+            ) as typeof query;
         }
 
         if (validated.status) {
-            query = query.where(eq(interviews.status, validated.status));
+            query = query.where(eq(interviews.status, validated.status)) as typeof query;
         }
 
         // Execute query with pagination
@@ -164,7 +162,7 @@ export async function GET(req: NextRequest) {
             );
         }
 
-        logger.error('Failed to list interviews', { error });
+        logger.error({ err: error }, 'Failed to list interviews');
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }

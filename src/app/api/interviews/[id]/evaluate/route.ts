@@ -67,10 +67,10 @@ export async function POST(
             jobId: `eval-${interview.id}`, // Idempotency key
         });
 
-        logger.info('Evaluation job queued', {
+        logger.info({
             interviewId: interview.id,
             jobId: job.id,
-        });
+        }, 'Evaluation job queued');
 
         return NextResponse.json({
             message: 'Evaluation queued successfully',
@@ -78,7 +78,7 @@ export async function POST(
         }, { status: 202 });
 
     } catch (error) {
-        logger.error('Failed to trigger evaluation', { interviewId: id, error });
+        logger.error({ interviewId: id, err: error }, 'Failed to trigger evaluation');
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }

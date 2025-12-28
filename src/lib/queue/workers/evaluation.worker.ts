@@ -20,12 +20,12 @@ export const evaluationWorker = new Worker<EvaluationJobData>(
     async (job: Job<EvaluationJobData>) => {
         const { interviewId, notes } = job.data;
 
-        logger.info('Processing evaluation job', {
+        logger.info({
             jobId: job.id,
             interviewId,
             attempt: job.attemptsMade + 1,
             noteLength: notes.length,
-        });
+        }, 'Processing evaluation job');
 
         try {
             // Idempotency check - prevent duplicate evaluations
@@ -34,11 +34,11 @@ export const evaluationWorker = new Worker<EvaluationJobData>(
             });
 
             if (existingEvaluation) {
-                logger.info('Evaluation already exists, skipping', {
+                logger.info({
                     jobId: job.id,
                     interviewId,
                     evaluationId: existingEvaluation.id,
-                });
+                }, 'Evaluation already exists, skipping');
                 return existingEvaluation;
             }
 
@@ -66,23 +66,25 @@ export const evaluationWorker = new Worker<EvaluationJobData>(
                 })
                 .where(eq(interviews.id, interviewId));
 
-            logger.info('Evaluation job completed successfully', {
+            logger.info({
                 jobId: job.id,
                 interviewId,
                 evaluationId: savedEvaluation.id,
                 score: savedEvaluation.score,
-            });
+            }, 'Evaluation job completed successfully');
 
             return savedEvaluation;
 
-        } catch (error: any) {
-            logger.error('Evaluation job failed', {
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            const errorName = error instanceof Error ? error.name : 'UnknownError';
+            logger.error({
                 jobId: job.id,
                 interviewId,
-                error: error.message,
-                errorType: error.name,
+                error: errorMessage,
+                errorType: errorName,
                 attempt: job.attemptsMade + 1,
-            });
+            }, 'Evaluation job failed');
 
             // Re-throw to let BullMQ handle retries
             throw error;
@@ -96,12 +98,12 @@ export const evaluationWorker = new Worker<EvaluationJobData>(
 
 // Error handling
 evaluationWorker.on('failed', (job, error) => {
-    logger.error('Evaluation worker job permanently failed', {
+    logger.error({
         jobId: job?.id,
         interviewId: job?.data.interviewId,
         error: error.message,
         attempts: job?.attemptsMade,
-    });
+    }, 'Evaluation worker job permanently failed');
 });
 
 // Graceful shutdown

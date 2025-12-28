@@ -4,7 +4,7 @@ import {
     canTransition,
     InvalidTransitionError,
     type InterviewStatus,
-} from '../lib/domain/interview-state-machine';
+} from '../../lib/domain/interview-state-machine';
 
 describe('Interview State Machine', () => {
     describe('Valid Transitions', () => {

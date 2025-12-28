@@ -41,10 +41,10 @@ export async function generateInterviewEvaluation(
     interviewId: string
 ): Promise<AIEvaluation> {
     try {
-        logger.info('Starting AI interview evaluation', {
+        logger.info({
             interviewId,
             noteLength: notes.length
-        });
+        }, 'Starting AI interview evaluation');
 
         // Use a model available on OpenRouter (e.g., GPT-4o or Claude)
         const { object } = await generateObject({
@@ -65,32 +65,36 @@ ${notes}`,
             temperature: 0.3 // Lower temperature for more consistent evaluations
         });
 
-        logger.info('AI evaluation generated successfully', {
+        logger.info({
             interviewId,
             score: object.score,
             strengthsCount: object.strengths.length,
             risksCount: object.risks.length
-        });
+        }, 'AI evaluation generated successfully');
 
         return object;
 
-    } catch (error: any) {
-        logger.error('AI evaluation failed', {
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        const errorName = error instanceof Error ? error.name : 'UnknownError';
+        const errorCode = (error as { code?: string })?.code;
+
+        logger.error({
             interviewId,
-            error: error.message,
-            errorType: error.name,
-            errorCode: error.code
-        });
+            error: errorMessage,
+            errorType: errorName,
+            errorCode
+        }, 'AI evaluation failed');
 
         // Check for specific API errors
-        if (error.code === 'insufficient_quota') {
+        if (errorCode === 'insufficient_quota') {
             throw new AIEvaluationError(
                 'API quota exceeded. Please check your billing.',
                 error
             );
         }
 
-        if (error.code === 'invalid_api_key') {
+        if (errorCode === 'invalid_api_key') {
             throw new AIEvaluationError(
                 'Invalid API key. Please check your configuration.',
                 error
@@ -98,7 +102,7 @@ ${notes}`,
         }
 
         throw new AIEvaluationError(
-            `Failed to generate evaluation: ${error.message}`,
+            `Failed to generate evaluation: ${errorMessage}`,
             error
         );
     }

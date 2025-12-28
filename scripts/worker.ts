@@ -17,19 +17,19 @@ import '../src/lib/queue/workers/evaluation.worker';
 import { env } from '../src/lib/env';
 import { logger } from '../src/lib/logger';
 
-logger.info('Starting all workers', {
+logger.info({
     redisHost: env.REDIS_HOST,
     redisPort: env.REDIS_PORT,
     nodeEnv: env.NODE_ENV,
-});
+}, 'Starting all workers');
 
 // Handle uncaught errors
 process.on('uncaughtException', (error) => {
-    logger.error('Uncaught exception in worker process', { error: error.message });
+    logger.error({ error: error.message }, 'Uncaught exception in worker process');
     process.exit(1);
 });
 
 process.on('unhandledRejection', (reason) => {
-    logger.error('Unhandled rejection in worker process', { reason });
+    logger.error({ reason }, 'Unhandled rejection in worker process');
     process.exit(1);
 });

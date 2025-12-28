@@ -17,11 +17,11 @@ export const emailWorker = new Worker<EmailJobData>(
     async (job: Job<EmailJobData>) => {
         const { interviewId, candidateName, candidateEmail, interviewerEmail, scheduledAt, meetingLink } = job.data;
 
-        logger.info('Processing email job', {
+        logger.info({
             jobId: job.id,
             interviewId,
             attempt: job.attemptsMade + 1,
-        });
+        }, 'Processing email job');
 
         try {
             // Send interview confirmation email
@@ -33,21 +33,22 @@ export const emailWorker = new Worker<EmailJobData>(
                 meetingLink,
             });
 
-            logger.info('Email job completed successfully', {
+            logger.info({
                 jobId: job.id,
                 interviewId,
                 emailId: result.data?.id,
-            });
+            }, 'Email job completed successfully');
 
             return result;
 
-        } catch (error: any) {
-            logger.error('Email job failed', {
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            logger.error({
                 jobId: job.id,
                 interviewId,
-                error: error.message,
+                error: errorMessage,
                 attempt: job.attemptsMade + 1,
-            });
+            }, 'Email job failed');
 
             // Re-throw to let BullMQ handle retries
             throw error;
@@ -61,12 +62,12 @@ export const emailWorker = new Worker<EmailJobData>(
 
 // Error handling
 emailWorker.on('failed', (job, error) => {
-    logger.error('Email worker job permanently failed', {
+    logger.error({
         jobId: job?.id,
         interviewId: job?.data.interviewId,
         error: error.message,
         attempts: job?.attemptsMade,
-    });
+    }, 'Email worker job permanently failed');
 });
 
 // Graceful shutdown

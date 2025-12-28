@@ -40,7 +40,7 @@ export async function GET(
         return NextResponse.json(interview);
 
     } catch (error) {
-        logger.error('Failed to fetch interview', { interviewId: id, error });
+        logger.error({ interviewId: id, err: error }, 'Failed to fetch interview');
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
@@ -78,9 +78,10 @@ export async function PATCH(
         if (validated.status && validated.status !== currentInterview.status) {
             try {
                 transitionStatus(currentInterview.status, validated.status);
-            } catch (error: any) {
+            } catch (error: unknown) {
+                const message = error instanceof Error ? error.message : 'Invalid transition';
                 return NextResponse.json(
-                    { error: error.message },
+                    { error: message },
                     { status: 400 }
                 );
             }
@@ -96,10 +97,10 @@ export async function PATCH(
             .where(eq(interviews.id, id))
             .returning();
 
-        logger.info('Interview updated', {
+        logger.info({
             interviewId: id,
             updates: validated,
-        });
+        }, 'Interview updated');
 
         return NextResponse.json(updatedInterview);
 
@@ -111,7 +112,7 @@ export async function PATCH(
             );
         }
 
-        logger.error('Failed to update interview', { interviewId: id, error });
+        logger.error({ interviewId: id, err: error }, 'Failed to update interview');
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
