@@ -16,10 +16,11 @@ const openrouter = createOpenAI({
 export const questionsSchema = z.object({
     questions: z.array(z.object({
         question: z.string().describe('The interview question'),
-        category: z.enum(['technical', 'behavioral', 'situational', 'culture_fit']).describe('Category of the question'),
+        category: z.enum(['personal', 'behavioral', 'technical']).describe('Category of the question'),
         difficulty: z.enum(['easy', 'medium', 'hard']).describe('Difficulty level'),
+        timeLimit: z.number().describe('Time limit in seconds (120 for personal, 180 for behavioral, 240 for technical)'),
         expectedAnswer: z.string().describe('Key points for a good answer'),
-    })).min(5).max(10),
+    })).min(6).max(10),
 });
 
 export type GeneratedQuestions = z.infer<typeof questionsSchema>;
@@ -42,22 +43,33 @@ export async function generateInterviewQuestions(
         const { object } = await generateObject({
             model: openrouter('openai/gpt-4o-mini'),
             schema: questionsSchema,
-            prompt: `You are an expert technical recruiter and interviewer. Generate interview questions for the following position:
+            prompt: `You are an expert technical recruiter. Generate interview questions for a candidate assessment.
 
 Job Role: ${jobRole}
 Experience Level: ${jobLevel}
 
-Generate 7-8 high-quality interview questions that:
-1. Are appropriate for the experience level
-2. Mix technical, behavioral, and situational questions
-3. Help assess both hard skills and soft skills
-4. Are specific to the role, not generic
+Generate exactly 8 questions with this distribution:
+- 2 Personal questions (about background, motivation, career goals)
+- 3 Behavioral questions (past experiences, problem-solving, teamwork)
+- 3 Technical questions (role-specific skills and knowledge)
 
-For each question, specify:
-- The question itself
-- Category (technical, behavioral, situational, culture_fit)
-- Difficulty level (easy, medium, hard)
-- Optional: Key points for a good answer`,
+Time limits by category:
+- personal: 120 seconds (2 minutes)
+- behavioral: 180 seconds (3 minutes)  
+- technical: 240 seconds (4 minutes)
+
+Requirements:
+1. Questions should be appropriate for the experience level
+2. Technical questions should be specific to ${jobRole}
+3. Start with easier questions and progress to harder ones
+4. Include a mix of difficulties (easy, medium, hard)
+
+For each question provide:
+- The question itself (clear and concise)
+- Category (personal, behavioral, or technical)
+- Difficulty (easy, medium, hard)
+- Time limit in seconds
+- Key points expected in a good answer`,
             temperature: 0.7,
         });
 
