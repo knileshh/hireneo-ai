@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import { ClerkProvider } from '@clerk/nextjs';
 import { Providers } from './providers';
-import { Inter, Outfit, Caveat } from 'next/font/google';
+import { Inter, Outfit, Caveat, Syne } from 'next/font/google';
 import './globals.css';
 
 // Font configuration
@@ -24,6 +24,12 @@ const caveat = Caveat({
   display: 'swap',
 });
 
+const syne = Syne({
+  subsets: ['latin'],
+  variable: '--font-syne',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   title: 'HireNeo AI - Interview Orchestration',
   description: 'AI-powered interview management system',
@@ -41,7 +47,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${inter.variable} ${outfit.variable} ${caveat.variable} light`}>
+      <html lang="en" className={`${inter.variable} ${outfit.variable} ${caveat.variable} ${syne.variable} light`}>
         <head>
           {/* Microsoft Clarity Analytics */}
           <Script id="clarity-script" strategy="afterInteractive">

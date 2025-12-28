@@ -10,15 +10,13 @@ export function Footer() {
 
     const handleSubscribe = (e: React.FormEvent) => {
         e.preventDefault();
-        // Handle newsletter subscription
         console.log('Subscribe:', email);
         setEmail('');
     };
 
     return (
-        <footer className="bg-[#FAFAF9] border-t border-black/5">
-            {/* Main Footer Content */}
-            <div className="max-w-7xl mx-auto px-4 pt-16 pb-0">
+        <footer className="bg-[#FAFAF9] border-t border-black/5 overflow-hidden relative">
+            <div className="max-w-7xl mx-auto px-4 pt-20 pb-12 relative z-10">
                 <div className="grid md:grid-cols-2 gap-12 mb-12">
                     {/* Left: Branding */}
                     <div>
@@ -27,7 +25,7 @@ export function Footer() {
                                 <span className="font-heading font-bold text-3xl text-[#1A3305]">H</span>
                             </div>
                             <h3 className="font-heading font-bold text-3xl">
-                                HireNeo<sup className="text-xl">AI</sup>
+                                HireNeo AI
                             </h3>
                         </div>
 
@@ -89,10 +87,11 @@ export function Footer() {
                 <div className="border-t-2 border-dashed border-black/30 mb-12"></div>
 
                 {/* Footer Links */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-24">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-8">
+                    {/* ... (content inside remains same, no changes needed for inner blocks if just changing container class) ... */}
                     {/* Company */}
-                    <div>
-                        <h4 className="font-bold text-lg mb-4">Company</h4>
+                    <div className="space-y-4">
+                        <h4 className="font-bold text-lg">Company</h4>
                         <ul className="space-y-2">
                             <li><Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">About Us</Link></li>
                             <li><Link href="/careers" className="text-muted-foreground hover:text-foreground transition-colors">Careers</Link></li>
@@ -101,8 +100,8 @@ export function Footer() {
                     </div>
 
                     {/* Quick Links */}
-                    <div>
-                        <h4 className="font-bold text-lg mb-4">Quick Links</h4>
+                    <div className="space-y-4">
+                        <h4 className="font-bold text-lg">Quick Links</h4>
                         <ul className="space-y-2">
                             <li><Link href="/blog" className="text-muted-foreground hover:text-foreground transition-colors">Blog</Link></li>
                             <li><Link href="/community" className="text-muted-foreground hover:text-foreground transition-colors">Community</Link></li>
@@ -111,8 +110,8 @@ export function Footer() {
                     </div>
 
                     {/* Industry */}
-                    <div>
-                        <h4 className="font-bold text-lg mb-4">Industry</h4>
+                    <div className="space-y-4">
+                        <h4 className="font-bold text-lg">Industry</h4>
                         <ul className="space-y-2">
                             <li><Link href="/hiring" className="text-muted-foreground hover:text-foreground transition-colors">Hiring</Link></li>
                             <li><Link href="/interviewing" className="text-muted-foreground hover:text-foreground transition-colors">Interviewing</Link></li>
@@ -120,13 +119,15 @@ export function Footer() {
                         </ul>
                     </div>
                 </div>
+            </div>
 
-                {/* Large Watermark */}
-                <div className="relative w-full overflow-hidden mt-12">
-                    <h2 className="font-heading font-black text-[15.5vw] text-[#1A3305] opacity-20 text-center uppercase tracking-tighter leading-[0.75] w-full select-none">
-                        HireNeoAI
-                    </h2>
-                </div>
+            {/* Massive Full-Width Watermark - Top 75% Visible */}
+            <div className="w-full overflow-hidden h-[11vw] flex items-start justify-center">
+                <h2
+                    className="font-syne font-extrabold text-[18.2vw] text-[#1A3305]/20 text-center uppercase tracking-tighter leading-[0.8] select-none block w-full"
+                >
+                    HireNeo AI
+                </h2>
             </div>
         </footer>
     );
