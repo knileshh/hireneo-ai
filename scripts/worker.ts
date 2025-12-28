@@ -12,6 +12,7 @@ import 'dotenv/config';
 
 import '../src/lib/queue/workers/email.worker';
 import '../src/lib/queue/workers/evaluation.worker';
+import '../src/lib/queue/workers/reminder.worker';
 
 // Load environment variables
 import { env } from '../src/lib/env';

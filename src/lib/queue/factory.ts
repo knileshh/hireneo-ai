@@ -1,59 +1,126 @@
-import { Queue, QueueOptions } from 'bullmq';
-import { env } from '../env';
+import { Queue } from 'bullmq';
+import { env } from '@/lib/env';
 
-// Redis connection configuration
 const connection = {
     host: env.REDIS_HOST,
     port: env.REDIS_PORT,
 };
 
-// Email queue for sending interview confirmations
-export const emailQueue = new Queue('email', {
-    connection,
-    defaultJobOptions: {
-        attempts: 3,
-        backoff: {
-            type: 'exponential',
-            delay: 2000, // 2s, 4s, 8s
-        },
-        removeOnComplete: {
-            count: 100, // Keep last 100 completed jobs
-        },
-        removeOnFail: {
-            count: 500, // Keep last 500 failed jobs for debugging
-        },
-    },
-});
-
-// Evaluation queue for AI-powered interview evaluations
-export const evaluationQueue = new Queue('evaluation', {
-    connection,
-    defaultJobOptions: {
-        attempts: 3,
-        backoff: {
-            type: 'exponential',
-            delay: 2000,
-        },
-        removeOnComplete: {
-            count: 100,
-        },
-        removeOnFail: {
-            count: 500,
-        },
-    },
-});
-
-// Export job data types for type safety
+// Email job data
 export interface EmailJobData {
     interviewId: string;
     candidateName: string;
     candidateEmail: string;
     interviewerEmail: string;
-    scheduledAt: string; // ISO string
+    scheduledAt: string;
     meetingLink?: string;
 }
 
+// Evaluation job data
 export interface EvaluationJobData {
     interviewId: string;
     notes: string;
+}
+
+// Reminder job data
+export interface ReminderJobData {
+    interviewId: string;
+    candidateName: string;
+    candidateEmail: string;
+    scheduledAt: string;
+    reminderType: '24h' | '1h';
+}
+
+// Email queue for interview confirmations
+export const emailQueue = new Queue<EmailJobData>('email', {
+    connection,
+    defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+            type: 'exponential',
+            delay: 5000,
+        },
+        removeOnComplete: 100,
+        removeOnFail: 1000,
+    },
+});
+
+// Evaluation queue for AI processing
+export const evaluationQueue = new Queue<EvaluationJobData>('evaluation', {
+    connection,
+    defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+            type: 'exponential',
+            delay: 10000,
+        },
+        removeOnComplete: 50,
+        removeOnFail: 500,
+    },
+});
+
+// Reminder queue for scheduled reminders
+export const reminderQueue = new Queue<ReminderJobData>('reminder', {
+    connection,
+    defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+            type: 'exponential',
+            delay: 5000,
+        },
+        removeOnComplete: 100,
+        removeOnFail: 500,
+    },
+});
+
+/**
+ * Schedule reminder jobs for an interview
+ * Called after interview is created
+ */
+export async function scheduleReminders(data: {
+    interviewId: string;
+    candidateName: string;
+    candidateEmail: string;
+    scheduledAt: Date;
+}) {
+    const scheduledTime = data.scheduledAt.getTime();
+    const now = Date.now();
+
+    // 24 hour reminder
+    const reminder24h = scheduledTime - 24 * 60 * 60 * 1000;
+    if (reminder24h > now) {
+        await reminderQueue.add(
+            'send-reminder',
+            {
+                interviewId: data.interviewId,
+                candidateName: data.candidateName,
+                candidateEmail: data.candidateEmail,
+                scheduledAt: data.scheduledAt.toISOString(),
+                reminderType: '24h',
+            },
+            {
+                jobId: `reminder-24h-${data.interviewId}`,
+                delay: reminder24h - now,
+            }
+        );
+    }
+
+    // 1 hour reminder
+    const reminder1h = scheduledTime - 60 * 60 * 1000;
+    if (reminder1h > now) {
+        await reminderQueue.add(
+            'send-reminder',
+            {
+                interviewId: data.interviewId,
+                candidateName: data.candidateName,
+                candidateEmail: data.candidateEmail,
+                scheduledAt: data.scheduledAt.toISOString(),
+                reminderType: '1h',
+            },
+            {
+                jobId: `reminder-1h-${data.interviewId}`,
+                delay: reminder1h - now,
+            }
+        );
+    }
 }
