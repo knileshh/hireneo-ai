@@ -72,44 +72,41 @@ const testimonials = [
     },
 ];
 
-// Duplicate testimonials for seamless infinite scroll
-const extendedTestimonials = [...testimonials, ...testimonials];
+// Duplicate testimonials for seamless infinite scroll (triple for smooth experience)
+const extendedTestimonials = [...testimonials, ...testimonials, ...testimonials];
 
 export function Testimonials() {
     return (
-        <section className="py-20 px-4 bg-white border-y border-black/5 overflow-hidden">
-            <div className="max-w-7xl mx-auto">
+        <section className="py-20 bg-white border-y border-black/5 overflow-hidden">
+            {/* Header */}
+            <div className="max-w-7xl mx-auto px-4 text-center mb-16">
+                <h2 className="font-heading font-bold text-4xl md:text-5xl mb-4">
+                    Loved by{' '}
+                    <span className="relative inline-block">
+                        <span className="relative z-10">hiring teams</span>
+                        <span className="absolute bottom-1 left-0 right-0 h-3 bg-[#ECFDF5] -z-0 transform -rotate-1 rounded-sm"></span>
+                    </span>
+                </h2>
+                <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                    Join thousands of companies making better hiring decisions with AI
+                </p>
+            </div>
 
-                {/* Header */}
-                <div className="text-center mb-16">
-                    <h2 className="font-heading font-bold text-4xl md:text-5xl mb-4">
-                        Loved by{' '}
-                        <span className="relative inline-block">
-                            <span className="relative z-10">hiring teams</span>
-                            <span className="absolute bottom-1 left-0 right-0 h-3 bg-[#ECFDF5] -z-0 transform -rotate-1 rounded-sm"></span>
-                        </span>
-                    </h2>
-                    <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                        Join thousands of companies making better hiring decisions with AI
-                    </p>
+            {/* Full-width Scrolling Marquee - Row 1 (Left to Right) */}
+            <div className="relative mb-6 overflow-hidden">
+                <div className="flex gap-6 animate-marquee">
+                    {extendedTestimonials.map((testimonial, index) => (
+                        <TestimonialCard key={`row1-${testimonial.id}-${index}`} testimonial={testimonial} />
+                    ))}
                 </div>
+            </div>
 
-                {/* Scrolling Marquee - Row 1 (Left to Right) */}
-                <div className="relative mb-6 overflow-hidden">
-                    <div className="flex gap-6 animate-marquee">
-                        {extendedTestimonials.slice(0, 8).map((testimonial, index) => (
-                            <TestimonialCard key={`row1-${testimonial.id}-${index}`} testimonial={testimonial} />
-                        ))}
-                    </div>
-                </div>
-
-                {/* Scrolling Marquee - Row 2 (Right to Left) */}
-                <div className="relative overflow-hidden">
-                    <div className="flex gap-6 animate-marquee-reverse">
-                        {extendedTestimonials.slice(0, 8).reverse().map((testimonial, index) => (
-                            <TestimonialCard key={`row2-${testimonial.id}-${index}`} testimonial={testimonial} />
-                        ))}
-                    </div>
+            {/* Full-width Scrolling Marquee - Row 2 (Right to Left) */}
+            <div className="relative overflow-hidden">
+                <div className="flex gap-6 animate-marquee-reverse">
+                    {extendedTestimonials.map((testimonial, index) => (
+                        <TestimonialCard key={`row2-${testimonial.id}-${index}`} testimonial={testimonial} />
+                    ))}
                 </div>
             </div>
 
