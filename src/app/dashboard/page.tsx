@@ -104,11 +104,20 @@ export default function DashboardPage() {
 
   const deleteInterviewMutation = useMutation({
     mutationFn: async (id: string) => {
+      console.log('Deleting interview:', id);
       const res = await fetch(`/api/interviews/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed');
+      if (!res.ok) {
+        const error = await res.text();
+        console.error('Delete failed:', error);
+        throw new Error(error || 'Failed to delete');
+      }
       return res.json();
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['interviews'] }),
+    onError: (error) => {
+      console.error('Delete mutation error:', error);
+      alert('Failed to delete interview. Check console for details.');
+    }
   });
 
   // Filter interviews
@@ -342,7 +351,8 @@ export default function DashboardPage() {
                               )}
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
-                                onClick={() => {
+                                onSelect={(e) => {
+                                  e.preventDefault(); // Prevent menu from closing immediately
                                   if (confirm('Are you sure you want to delete this interview?')) {
                                     deleteInterviewMutation.mutate(interview.id);
                                   }
@@ -350,7 +360,11 @@ export default function DashboardPage() {
                                 disabled={deleteInterviewMutation.isPending}
                                 className="text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
                               >
-                                <Trash2 className="w-4 h-4 mr-2" />
+                                {deleteInterviewMutation.isPending ? (
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                )}
                                 Delete
                               </DropdownMenuItem>
                             </DropdownMenuContent>
