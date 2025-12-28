@@ -18,13 +18,13 @@ export function Footer() {
     return (
         <footer className="bg-[#FAFAF9] border-t border-black/5">
             {/* Main Footer Content */}
-            <div className="max-w-7xl mx-auto px-4 py-16">
+            <div className="max-w-7xl mx-auto px-4 pt-16 pb-0">
                 <div className="grid md:grid-cols-2 gap-12 mb-12">
                     {/* Left: Branding */}
                     <div>
                         <div className="flex items-center gap-3 mb-8">
-                            <div className="w-16 h-16 bg-[#FDE047] rounded-xl flex items-center justify-center">
-                                <span className="font-heading font-bold text-3xl text-black">H</span>
+                            <div className="w-16 h-16 bg-[#ECFDF5] rounded-xl flex items-center justify-center border border-[#1A3305]/10">
+                                <span className="font-heading font-bold text-3xl text-[#1A3305]">H</span>
                             </div>
                             <h3 className="font-heading font-bold text-3xl">
                                 HireNeo<sup className="text-xl">AI</sup>
@@ -89,7 +89,7 @@ export function Footer() {
                 <div className="border-t-2 border-dashed border-black/30 mb-12"></div>
 
                 {/* Footer Links */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-16">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-8 mb-24">
                     {/* Company */}
                     <div>
                         <h4 className="font-bold text-lg mb-4">Company</h4>
@@ -97,8 +97,6 @@ export function Footer() {
                             <li><Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">About Us</Link></li>
                             <li><Link href="/careers" className="text-muted-foreground hover:text-foreground transition-colors">Careers</Link></li>
                             <li><Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">Contact</Link></li>
-                            <li><Link href="/community" className="text-muted-foreground hover:text-foreground transition-colors">Community</Link></li>
-                            <li><Link href="/testimonials" className="text-muted-foreground hover:text-foreground transition-colors">Testimonials</Link></li>
                         </ul>
                     </div>
 
@@ -106,11 +104,9 @@ export function Footer() {
                     <div>
                         <h4 className="font-bold text-lg mb-4">Quick Links</h4>
                         <ul className="space-y-2">
-                            <li><Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">About Us</Link></li>
-                            <li><Link href="/careers" className="text-muted-foreground hover:text-foreground transition-colors">Careers</Link></li>
-                            <li><Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">Contact</Link></li>
+                            <li><Link href="/blog" className="text-muted-foreground hover:text-foreground transition-colors">Blog</Link></li>
                             <li><Link href="/community" className="text-muted-foreground hover:text-foreground transition-colors">Community</Link></li>
-                            <li><Link href="/testimonials" className="text-muted-foreground hover:text-foreground transition-colors">Testimonials</Link></li>
+                            <li><Link href="/help" className="text-muted-foreground hover:text-foreground transition-colors">Help Center</Link></li>
                         </ul>
                     </div>
 
@@ -118,29 +114,18 @@ export function Footer() {
                     <div>
                         <h4 className="font-bold text-lg mb-4">Industry</h4>
                         <ul className="space-y-2">
-                            <li><Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">About Us</Link></li>
-                            <li><Link href="/careers" className="text-muted-foreground hover:text-foreground transition-colors">Careers</Link></li>
-                            <li><Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">Contact</Link></li>
-                            <li><Link href="/community" className="text-muted-foreground hover:text-foreground transition-colors">Community</Link></li>
-                            <li><Link href="/testimonials" className="text-muted-foreground hover:text-foreground transition-colors">Testimonials</Link></li>
+                            <li><Link href="/hiring" className="text-muted-foreground hover:text-foreground transition-colors">Hiring</Link></li>
+                            <li><Link href="/interviewing" className="text-muted-foreground hover:text-foreground transition-colors">Interviewing</Link></li>
+                            <li><Link href="/recruitment" className="text-muted-foreground hover:text-foreground transition-colors">Recruitment</Link></li>
                         </ul>
                     </div>
                 </div>
 
                 {/* Large Watermark */}
-                <div className="relative overflow-hidden h-32">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <h2 className="font-heading font-bold text-[120px] md:text-[180px] text-[#1A3305] opacity-20 whitespace-nowrap">
-                            HireNeo<sup className="text-[80px] md:text-[120px]">AI</sup>
-                        </h2>
-                    </div>
-                </div>
-            </div>
-
-            {/* Bottom Bar */}
-            <div className="border-t border-black/5 py-6">
-                <div className="max-w-7xl mx-auto px-4 text-center text-sm text-muted-foreground">
-                    © 2024 HireNeo AI. All rights reserved.
+                <div className="relative w-full overflow-hidden pb-0 leading-none">
+                    <h2 className="font-heading font-bold text-[13vw] text-[#1A3305] opacity-20 text-center uppercase tracking-tighter leading-[0.8]">
+                        HireNeoAI
+                    </h2>
                 </div>
             </div>
         </footer>
