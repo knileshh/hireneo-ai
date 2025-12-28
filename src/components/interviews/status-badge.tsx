@@ -30,7 +30,7 @@ const statusConfig: Record<InterviewStatus, { label: string; className: string }
     },
     EVALUATED: {
         label: 'Evaluated',
-        className: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900 dark:text-purple-300',
+        className: 'bg-teal-100 text-teal-700 border-teal-200 dark:bg-teal-900 dark:text-teal-300',
     },
 };
 

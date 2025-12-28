@@ -7,14 +7,13 @@ import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 
 export function Navbar() {
     return (
-        <nav className="sticky top-4 z-50 mx-auto max-w-7xl px-4">
-            <div className="bg-[#FFFFF0] border-2 border-dashed border-black/10 rounded-2xl px-6 py-3 flex items-center justify-between shadow-sm">
+        <nav className="sticky top-6 z-50 mx-auto max-w-5xl px-4">
+            <div className="bg-[#FFFFF0]/95 backdrop-blur-sm border-2 border-dashed border-black/10 rounded-2xl px-6 py-3 flex items-center justify-between shadow-sm">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2">
-                    <div className="bg-primary text-primary-foreground font-heading font-bold h-10 w-10 flex items-center justify-center rounded-xl text-xl">
+                    <div className="bg-white border border-black/10 text-black font-heading font-bold h-10 w-10 flex items-center justify-center rounded-lg text-xl shadow-sm">
                         H
                     </div>
-                    <span className="font-heading font-bold text-xl tracking-tight">HireNeo</span>
                 </Link>
 
                 {/* Links - Desktop */}

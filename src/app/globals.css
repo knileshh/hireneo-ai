@@ -85,7 +85,8 @@
   /* Main background */
   --surface-yellow: oklch(0.94 0.15 95);
   /* Bright Yellow Cards */
-  --surface-purple: oklch(0.92 0.08 280);
+  --surface-purple: oklch(0.92 0 0);
+  /* Replaced with neutral (gray) */
   /* Lilac Cards */
   --surface-green: oklch(0.95 0.1 140);
   /* Mint Cards */
@@ -136,7 +137,8 @@
   /* Pastels in Dark Mode (Desaturated/Tinted) */
   --cream: oklch(0.12 0.03 130);
   --surface-yellow: oklch(0.25 0.1 95);
-  --surface-purple: oklch(0.25 0.08 280);
+  --surface-purple: oklch(0.25 0 0);
+  /* Replaced with neutral (black/gray) */
   --surface-green: oklch(0.25 0.1 140);
   --surface-pink: oklch(0.25 0.1 340);
 }

@@ -27,7 +27,7 @@ type Interview = {
   id: string;
   candidateName: string;
   jobRole?: string;
-  status: 'SCHEDULED' | 'COMPLETED' | 'EVALUATED' | 'CANCELLED';
+  status: 'SCHEDULED' | 'COMPLETED' | 'EVALUATED';
   scheduledAt: string;
   averageScore?: number;
 };
@@ -62,7 +62,9 @@ export default function DashboardPage() {
   const total = interviews?.length || 0;
   const completed = interviews?.filter(i => i.status === 'COMPLETED' || i.status === 'EVALUATED').length || 0;
   const scheduled = interviews?.filter(i => i.status === 'SCHEDULED').length || 0;
-  const avgScore = interviews?.reduce((acc, curr) => acc + (curr.averageScore || 0), 0) / (interviews?.filter(i => i.averageScore).length || 1);
+  const avgScore = interviews && interviews.length > 0
+    ? interviews.reduce((acc, curr) => acc + (curr.averageScore || 0), 0) / (interviews.filter(i => i.averageScore).length || 1)
+    : 0;
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">

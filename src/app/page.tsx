@@ -88,7 +88,7 @@ export default function LandingPage() {
                     </div>
                     <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
                         Hire Smarter with
-                        <span className="bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent"> AI-Powered </span>
+                        <span className="text-[#1A3305]"> AI-Powered </span>
                         Interviews
                     </h1>
                     <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
@@ -123,7 +123,7 @@ export default function LandingPage() {
                     <div className="grid md:grid-cols-3 gap-6">
                         <Card>
                             <CardHeader>
-                                <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mb-4">
+                                <div className="w-12 h-12 bg-[#ECFDF5] dark:bg-[#064E3B] rounded-lg flex items-center justify-center mb-4 text-[#059669]">
                                     <BrainIcon />
                                 </div>
                                 <CardTitle>AI Question Generator</CardTitle>
@@ -170,7 +170,7 @@ export default function LandingPage() {
                     </div>
                     <div className="grid md:grid-cols-3 gap-8">
                         <div className="text-center">
-                            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
+                            <div className="w-16 h-16 bg-[#F3F4F6] text-black border-2 border-dashed border-black/20 rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-xl shadow-sm">
                                 1
                             </div>
                             <h3 className="font-semibold text-lg mb-2">Schedule Interview</h3>
@@ -179,7 +179,7 @@ export default function LandingPage() {
                             </p>
                         </div>
                         <div className="text-center">
-                            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
+                            <div className="w-16 h-16 bg-[#FEF08A] text-black border-2 border-dashed border-black/10 rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-xl shadow-sm">
                                 2
                             </div>
                             <h3 className="font-semibold text-lg mb-2">Fill Scorecard</h3>
@@ -188,7 +188,7 @@ export default function LandingPage() {
                             </p>
                         </div>
                         <div className="text-center">
-                            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-xl">
+                            <div className="w-16 h-16 bg-[#ECFDF5] text-[#059669] rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-xl border border-[#059669]/20">
                                 3
                             </div>
                             <h3 className="font-semibold text-lg mb-2">Get AI Evaluation</h3>
@@ -201,7 +201,7 @@ export default function LandingPage() {
             </section>
 
             {/* CTA Section */}
-            <section className="py-20 bg-gradient-to-br from-purple-600 to-blue-600 px-4">
+            <section className="py-20 bg-[#1A3305] px-4">
                 <div className="max-w-3xl mx-auto text-center text-white">
                     <h2 className="text-3xl font-bold mb-4">Ready to Hire Smarter?</h2>
                     <p className="text-lg opacity-90 mb-8">
