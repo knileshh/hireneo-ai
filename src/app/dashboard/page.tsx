@@ -342,9 +342,13 @@ export default function DashboardPage() {
                               )}
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
-                                onClick={() => deleteInterviewMutation.mutate(interview.id)}
+                                onClick={() => {
+                                  if (confirm('Are you sure you want to delete this interview?')) {
+                                    deleteInterviewMutation.mutate(interview.id);
+                                  }
+                                }}
                                 disabled={deleteInterviewMutation.isPending}
-                                className="text-red-600 focus:text-red-600"
+                                className="text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
                               >
                                 <Trash2 className="w-4 h-4 mr-2" />
                                 Delete

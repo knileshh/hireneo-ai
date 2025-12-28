@@ -119,3 +119,40 @@ export async function PATCH(
         );
     }
 }
+
+/**
+ * DELETE /api/interviews/[id]
+ * Delete an interview
+ */
+export async function DELETE(
+    req: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    const { id } = await params;
+
+    try {
+        const interview = await db.query.interviews.findFirst({
+            where: eq(interviews.id, id),
+        });
+
+        if (!interview) {
+            return NextResponse.json(
+                { error: 'Interview not found' },
+                { status: 404 }
+            );
+        }
+
+        await db.delete(interviews).where(eq(interviews.id, id));
+
+        logger.info({ interviewId: id }, 'Interview deleted');
+
+        return NextResponse.json({ success: true, id });
+
+    } catch (error) {
+        logger.error({ interviewId: id, err: error }, 'Failed to delete interview');
+        return NextResponse.json(
+            { error: 'Internal server error' },
+            { status: 500 }
+        );
+    }
+}
