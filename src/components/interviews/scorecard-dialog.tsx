@@ -49,8 +49,8 @@ function ScoreSelector({
                         type="button"
                         onClick={() => onChange(score)}
                         className={`flex-1 py-2 px-3 rounded-md border text-sm transition-colors ${value === score
-                                ? 'bg-primary text-primary-foreground border-primary'
-                                : 'bg-background hover:bg-accent border-input'
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background hover:bg-accent border-input'
                             }`}
                     >
                         {score}
@@ -105,13 +105,16 @@ export function ScorecardDialog({ interviewId, children }: ScorecardDialogProps)
         }
     };
 
-    const averageScore = [
+    const scores = [
         scorecard.technicalScore,
         scorecard.communicationScore,
         scorecard.cultureFitScore,
         scorecard.problemSolvingScore,
-    ].filter(Boolean).reduce((sum, score) => sum + (score || 0), 0) /
-        [scorecard.technicalScore, scorecard.communicationScore, scorecard.cultureFitScore, scorecard.problemSolvingScore].filter(Boolean).length || 0;
+    ].filter((s): s is number => s !== undefined && s !== null);
+
+    const averageScore = scores.length > 0
+        ? scores.reduce((sum, score) => sum + score, 0) / scores.length
+        : 0;
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
