@@ -4,7 +4,7 @@ import { db } from '@/lib/db';
 import { interviews } from '@/lib/db/schema';
 import { emailQueue, EmailJobData } from '@/lib/queue/factory';
 import { logger } from '@/lib/logger';
-import { desc, like, or, count } from 'drizzle-orm';
+import { desc, like, or, count, eq } from 'drizzle-orm';
 
 // Validation schemas
 const createInterviewSchema = z.object({
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
         const [updatedInterview] = await db
             .update(interviews)
             .set({ status: 'SCHEDULED' })
-            .where(db.$with('id').eq(interview.id))
+            .where(eq(interviews.id, interview.id))
             .returning();
 
         logger.info('Interview created and email queued', {
@@ -124,7 +124,7 @@ export async function GET(req: NextRequest) {
         }
 
         if (validated.status) {
-            query = query.where(db.$with('status').eq(validated.status));
+            query = query.where(eq(interviews.status, validated.status));
         }
 
         // Execute query with pagination

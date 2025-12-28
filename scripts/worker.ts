@@ -7,8 +7,8 @@
  * Usage: tsx scripts/worker.ts
  */
 
-import './email.worker';
-import './evaluation.worker';
+import '../src/lib/queue/workers/email.worker';
+import '../src/lib/queue/workers/evaluation.worker';
 
 // Load environment variables
 import { env } from '../src/lib/env';
