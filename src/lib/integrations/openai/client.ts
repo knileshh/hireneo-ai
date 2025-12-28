@@ -4,8 +4,7 @@ import { z } from 'zod';
 import { env } from '@/lib/env';
 import { logger } from '@/lib/logger';
 
-// Create OpenRouter-compatible client
-// OpenRouter uses OpenAI-compatible API with a different base URL
+// OpenRouter client - use OpenAI-compatible API with OpenRouter base URL
 const openrouter = createOpenAI({
     apiKey: env.OPENAI_API_KEY,
     baseURL: 'https://openrouter.ai/api/v1',
@@ -48,7 +47,7 @@ export async function generateInterviewEvaluation(
 
         // Use a model available on OpenRouter (e.g., GPT-4o or Claude)
         const { object } = await generateObject({
-            model: openrouter('openai/gpt-4o'),
+            model: openrouter('openai/gpt-4o-mini'),
             schema: evaluationSchema,
             prompt: `You are an expert technical interviewer. Evaluate this interview based on the notes below.
 

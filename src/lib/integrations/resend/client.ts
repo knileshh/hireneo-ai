@@ -43,8 +43,13 @@ export const resendClient = {
     }, 'Sending interview confirmation email');
 
     try {
+      // In development, use Resend's test domain. In production, use verified domain.
+      const fromAddress = env.NODE_ENV === 'production'
+        ? 'HireNeo AI <noreply@hireneo.ai>'
+        : 'HireNeo AI <onboarding@resend.dev>';
+
       const result = await resend.emails.send({
-        from: 'HireNeo AI <noreply@hireneo.ai>',
+        from: fromAddress,
         to: [to],
         subject: `Interview Scheduled - ${scheduledAt.toLocaleDateString()}`,
         html: generateInterviewEmailHtml({

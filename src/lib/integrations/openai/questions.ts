@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { env } from '@/lib/env';
 import { logger } from '@/lib/logger';
 
-// OpenRouter client
+// OpenRouter client - use OpenAI-compatible API with OpenRouter base URL
 const openrouter = createOpenAI({
     apiKey: env.OPENAI_API_KEY,
     baseURL: 'https://openrouter.ai/api/v1',
@@ -40,7 +40,7 @@ export async function generateInterviewQuestions(
         }, 'Generating interview questions');
 
         const { object } = await generateObject({
-            model: openrouter('openai/gpt-4o'),
+            model: openrouter('openai/gpt-4o-mini'),
             schema: questionsSchema,
             prompt: `You are an expert technical recruiter and interviewer. Generate interview questions for the following position:
 
