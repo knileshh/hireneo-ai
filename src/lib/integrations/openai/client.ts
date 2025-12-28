@@ -1,8 +1,15 @@
 import { generateObject } from 'ai';
-import { openai } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { z } from 'zod';
 import { env } from '@/lib/env';
 import { logger } from '@/lib/logger';
+
+// Create OpenRouter-compatible client
+// OpenRouter uses OpenAI-compatible API with a different base URL
+const openrouter = createOpenAI({
+    apiKey: env.OPENAI_API_KEY,
+    baseURL: 'https://openrouter.ai/api/v1',
+});
 
 /**
  * Schema for AI-generated interview evaluation
@@ -39,10 +46,9 @@ export async function generateInterviewEvaluation(
             noteLength: notes.length
         });
 
+        // Use a model available on OpenRouter (e.g., GPT-4o or Claude)
         const { object } = await generateObject({
-            model: openai('gpt-4o', {
-                apiKey: env.OPENAI_API_KEY
-            }),
+            model: openrouter('openai/gpt-4o'),
             schema: evaluationSchema,
             prompt: `You are an expert technical interviewer. Evaluate this interview based on the notes below.
 
@@ -76,17 +82,17 @@ ${notes}`,
             errorCode: error.code
         });
 
-        // Check for specific OpenAI errors
+        // Check for specific API errors
         if (error.code === 'insufficient_quota') {
             throw new AIEvaluationError(
-                'OpenAI API quota exceeded. Please check your billing.',
+                'API quota exceeded. Please check your billing.',
                 error
             );
         }
 
         if (error.code === 'invalid_api_key') {
             throw new AIEvaluationError(
-                'Invalid OpenAI API key. Please check your configuration.',
+                'Invalid API key. Please check your configuration.',
                 error
             );
         }
