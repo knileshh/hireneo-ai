@@ -18,13 +18,15 @@ const updateInterviewSchema = z.object({
  */
 export async function GET(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
+
     try {
         const interview = await db.query.interviews.findFirst({
-            where: eq(interviews.id, params.id),
+            where: eq(interviews.id, id),
             with: {
-                evaluations: true,
+                evaluation: true,
             },
         });
 
@@ -38,7 +40,7 @@ export async function GET(
         return NextResponse.json(interview);
 
     } catch (error) {
-        logger.error('Failed to fetch interview', { interviewId: params.id, error });
+        logger.error('Failed to fetch interview', { interviewId: id, error });
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
@@ -52,15 +54,17 @@ export async function GET(
  */
 export async function PATCH(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
+
     try {
         const body = await req.json();
         const validated = updateInterviewSchema.parse(body);
 
         // Fetch current interview
         const currentInterview = await db.query.interviews.findFirst({
-            where: eq(interviews.id, params.id),
+            where: eq(interviews.id, id),
         });
 
         if (!currentInterview) {
@@ -89,11 +93,11 @@ export async function PATCH(
                 ...validated,
                 updatedAt: new Date(),
             })
-            .where(eq(interviews.id, params.id))
+            .where(eq(interviews.id, id))
             .returning();
 
         logger.info('Interview updated', {
-            interviewId: params.id,
+            interviewId: id,
             updates: validated,
         });
 
@@ -107,7 +111,7 @@ export async function PATCH(
             );
         }
 
-        logger.error('Failed to update interview', { interviewId: params.id, error });
+        logger.error('Failed to update interview', { interviewId: id, error });
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }

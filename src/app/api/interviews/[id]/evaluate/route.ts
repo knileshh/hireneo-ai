@@ -11,12 +11,14 @@ import { logger } from '@/lib/logger';
  */
 export async function POST(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const { id } = await params;
+
     try {
         // Fetch interview
         const interview = await db.query.interviews.findFirst({
-            where: eq(interviews.id, params.id),
+            where: eq(interviews.id, id),
         });
 
         if (!interview) {
@@ -36,7 +38,7 @@ export async function POST(
 
         // Check if evaluation already exists
         const existingEvaluation = await db.query.evaluations.findFirst({
-            where: eq(evaluations.interviewId, params.id),
+            where: eq(evaluations.interviewId, id),
         });
 
         if (existingEvaluation) {
@@ -53,7 +55,7 @@ export async function POST(
                 status: 'EVALUATION_PENDING',
                 updatedAt: new Date(),
             })
-            .where(eq(interviews.id, params.id));
+            .where(eq(interviews.id, id));
 
         // Queue evaluation job
         const jobData: EvaluationJobData = {
@@ -76,7 +78,7 @@ export async function POST(
         }, { status: 202 });
 
     } catch (error) {
-        logger.error('Failed to trigger evaluation', { interviewId: params.id, error });
+        logger.error('Failed to trigger evaluation', { interviewId: id, error });
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
