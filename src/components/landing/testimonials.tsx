@@ -95,7 +95,12 @@ export function Testimonials() {
                 </div>
 
                 {/* Scrolling Marquee - Row 1 (Left to Right) */}
-                <div className="relative mb-6">
+                <div className="relative mb-6 overflow-hidden">
+                    {/* Left Fade */}
+                    <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none backdrop-blur-sm"></div>
+                    {/* Right Fade */}
+                    <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none backdrop-blur-sm"></div>
+
                     <div className="flex gap-6 animate-marquee">
                         {extendedTestimonials.slice(0, 8).map((testimonial, index) => (
                             <TestimonialCard key={`row1-${testimonial.id}-${index}`} testimonial={testimonial} />
@@ -104,7 +109,12 @@ export function Testimonials() {
                 </div>
 
                 {/* Scrolling Marquee - Row 2 (Right to Left) */}
-                <div className="relative">
+                <div className="relative overflow-hidden">
+                    {/* Left Fade */}
+                    <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none backdrop-blur-sm"></div>
+                    {/* Right Fade */}
+                    <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none backdrop-blur-sm"></div>
+
                     <div className="flex gap-6 animate-marquee-reverse">
                         {extendedTestimonials.slice(0, 8).reverse().map((testimonial, index) => (
                             <TestimonialCard key={`row2-${testimonial.id}-${index}`} testimonial={testimonial} />
@@ -133,11 +143,11 @@ export function Testimonials() {
         }
 
         .animate-marquee {
-          animation: marquee 40s linear infinite;
+          animation: marquee 20s linear infinite;
         }
 
         .animate-marquee-reverse {
-          animation: marquee-reverse 40s linear infinite;
+          animation: marquee-reverse 20s linear infinite;
         }
       `}</style>
         </section>
