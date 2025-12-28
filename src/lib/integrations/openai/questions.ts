@@ -18,7 +18,7 @@ export const questionsSchema = z.object({
         question: z.string().describe('The interview question'),
         category: z.enum(['technical', 'behavioral', 'situational', 'culture_fit']).describe('Category of the question'),
         difficulty: z.enum(['easy', 'medium', 'hard']).describe('Difficulty level'),
-        expectedAnswer: z.string().optional().describe('Key points for a good answer'),
+        expectedAnswer: z.string().describe('Key points for a good answer'),
     })).min(5).max(10),
 });
 
