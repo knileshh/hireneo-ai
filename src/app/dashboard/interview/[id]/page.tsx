@@ -21,7 +21,10 @@ import {
     ClipboardList,
     Link2,
     Copy,
-    ExternalLink
+    ExternalLink,
+    MessageSquare,
+    Clock,
+    Mic
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -68,6 +71,20 @@ type AssessmentToken = {
     isCompleted?: boolean;
 };
 
+type CandidateResponse = {
+    id: string;
+    questionIndex: number;
+    question: string;
+    category: string;
+    timeLimit: number;
+    transcript?: string;
+    textAnswer?: string;
+    durationSeconds?: number;
+    aiScore?: number;
+    aiNotes?: string;
+    submittedAt?: string;
+};
+
 type Scorecard = {
     technicalScore?: number;
     communicationScore?: number;
@@ -104,6 +121,13 @@ const fetchAssessmentToken = async (id: string): Promise<AssessmentToken | null>
     return res.json();
 };
 
+const fetchCandidateResponses = async (id: string): Promise<{ responses: CandidateResponse[] } | null> => {
+    const res = await fetch(`/api/interviews/${id}/responses`);
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error('Failed to fetch responses');
+    return res.json();
+};
+
 export default function InterviewDetailPage() {
     const params = useParams();
     const router = useRouter();
@@ -135,6 +159,11 @@ export default function InterviewDetailPage() {
     const { data: assessmentToken, refetch: refetchAssessmentToken } = useQuery({
         queryKey: ['assessmentToken', id],
         queryFn: () => fetchAssessmentToken(id),
+    });
+
+    const { data: responsesData } = useQuery({
+        queryKey: ['responses', id],
+        queryFn: () => fetchCandidateResponses(id),
     });
 
     const [copied, setCopied] = useState(false);
@@ -437,6 +466,56 @@ export default function InterviewDetailPage() {
                     </p>
                 )}
             </div>
+
+            {/* Candidate Responses */}
+            {responsesData?.responses && responsesData.responses.length > 0 && (
+                <div className="bg-white rounded-3xl border border-black/5 p-8 shadow-sm">
+                    <h2 className="text-xl font-bold font-heading mb-4 flex items-center gap-2">
+                        <MessageSquare className="w-5 h-5" /> Candidate Responses
+                        <span className="text-sm font-normal text-muted-foreground">
+                            ({responsesData.responses.length} answers)
+                        </span>
+                    </h2>
+                    <div className="space-y-4">
+                        {responsesData.responses.map((response, index) => (
+                            <div
+                                key={response.id}
+                                className="bg-[#FAFAF9] rounded-xl p-4 border border-black/5"
+                            >
+                                <div className="flex items-start justify-between gap-4 mb-3">
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${response.category === 'personal' ? 'bg-blue-100 text-blue-700' :
+                                                    response.category === 'behavioral' ? 'bg-purple-100 text-purple-700' :
+                                                        'bg-green-100 text-green-700'
+                                                }`}>
+                                                {response.category}
+                                            </span>
+                                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                                <Clock className="w-3 h-3" />
+                                                {response.durationSeconds ? `${Math.floor(response.durationSeconds / 60)}:${(response.durationSeconds % 60).toString().padStart(2, '0')}` : '-'}
+                                            </span>
+                                            {response.transcript && (
+                                                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                                    <Mic className="w-3 h-3" /> Voice
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className="font-medium text-sm">
+                                            Q{response.questionIndex + 1}: {response.question}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="bg-white rounded-lg p-3 border">
+                                    <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                                        {response.transcript || response.textAnswer || 'No answer provided'}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* AI Evaluation */}
             {interview.evaluation && (
