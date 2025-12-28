@@ -132,16 +132,17 @@ function generateInterviewEmailHtml(params: {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Interview Scheduled</title>
       </head>
-      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 30px; border-radius: 12px 12px 0 0;">
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #FAFAF9;">
+        <div style="background: #1A3305; padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+          <img src="https://hireneo.ai/logo.png" alt="HireNeo AI" width="48" height="48" style="border-radius: 8px; margin-bottom: 12px;" />
           <h1 style="color: white; margin: 0; font-size: 24px;">Interview Scheduled</h1>
         </div>
-        <div style="background: #f8fafc; padding: 30px; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0; border-top: none;">
+        <div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0; border-top: none;">
           <p style="font-size: 16px; color: #334155; margin-top: 0;">Hello ${candidateName},</p>
           <p style="font-size: 16px; color: #334155;">Your interview has been scheduled!</p>
           
-          <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0;">
-            <p style="margin: 0 0 10px 0; color: #64748b; font-size: 14px;">Date & Time</p>
+          <div style="background: #ECFDF5; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #1A3305/20;">
+            <p style="margin: 0 0 10px 0; color: #1A3305; font-size: 14px; font-weight: 600;">📅 Date & Time</p>
             <p style="margin: 0; color: #0f172a; font-size: 18px; font-weight: 600;">
               ${scheduledAt.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -155,13 +156,13 @@ function generateInterviewEmailHtml(params: {
             </p>
           </div>
           
-          <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0;">
+          <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0;">
             <p style="margin: 0 0 10px 0; color: #64748b; font-size: 14px;">Interviewer</p>
             <p style="margin: 0; color: #0f172a; font-size: 16px;">${interviewerEmail}</p>
           </div>
           
           ${meetingLink ? `
-          <a href="${meetingLink}" style="display: inline-block; background: #6366f1; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 10px;">
+          <a href="${meetingLink}" style="display: inline-block; background: #1A3305; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 10px;">
             Join Meeting
           </a>
           ` : ''}
@@ -171,7 +172,7 @@ function generateInterviewEmailHtml(params: {
           </p>
           
           <p style="font-size: 14px; color: #94a3b8; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
-            Sent by HireNeo AI
+            Sent by <strong style="color: #1A3305;">HireNeo AI</strong>
           </p>
         </div>
       </body>

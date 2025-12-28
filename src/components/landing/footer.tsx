@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Linkedin, Twitter, Github } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -21,9 +22,13 @@ export function Footer() {
                     {/* Left: Branding */}
                     <div>
                         <div className="flex items-center gap-3 mb-8">
-                            <div className="w-16 h-16 bg-[#ECFDF5] rounded-xl flex items-center justify-center border border-[#1A3305]/10">
-                                <span className="font-heading font-bold text-3xl text-[#1A3305]">H</span>
-                            </div>
+                            <Image
+                                src="/logo.png"
+                                alt="HireNeo AI"
+                                width={64}
+                                height={64}
+                                className="rounded-xl"
+                            />
                             <h3 className="font-heading font-bold text-3xl">
                                 HireNeo AI
                             </h3>

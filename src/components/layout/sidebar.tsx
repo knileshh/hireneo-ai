@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,6 @@ import {
     FileText,
     Settings,
     LogOut,
-    BrainCircuit
 } from 'lucide-react';
 import { UserButton } from '@clerk/nextjs';
 
@@ -44,7 +44,7 @@ export function Sidebar() {
         <div className="flex bg-card h-full w-64 flex-col border-r">
             <div className="p-6">
                 <Link href="/" className="flex items-center gap-2 font-heading font-bold text-xl text-[#1A3305]">
-                    <BrainCircuit className="h-6 w-6" />
+                    <Image src="/logo.png" alt="HireNeo AI" width={32} height={32} className="rounded-md" />
                     <span>HireNeo AI</span>
                 </Link>
             </div>

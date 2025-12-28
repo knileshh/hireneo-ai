@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
@@ -11,9 +12,13 @@ export function Navbar() {
             <div className="bg-[#FFFFF0]/95 backdrop-blur-sm border-2 border-dashed border-black/10 rounded-2xl px-6 py-3 flex items-center justify-between shadow-sm">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2">
-                    <div className="bg-white border border-black/10 text-black font-heading font-bold h-10 w-10 flex items-center justify-center rounded-lg text-xl shadow-sm">
-                        H
-                    </div>
+                    <Image
+                        src="/logo.png"
+                        alt="HireNeo AI"
+                        width={40}
+                        height={40}
+                        className="rounded-lg"
+                    />
                 </Link>
 
                 {/* Links - Desktop */}
