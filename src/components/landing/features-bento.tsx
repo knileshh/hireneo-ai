@@ -118,7 +118,7 @@ export function FeaturesBento() {
                                 <Star className="w-4 h-4 fill-black/20" /> Sarah, Tech Lead
                             </div>
                         </StickyNote>
-                        <StickyNote color="bg-[#E9D5FF]" rotation={3}>
+                        <StickyNote color="bg-[#E5E7EB]" rotation={3}>
                             <h4 className="font-bold mb-2">Did you know?</h4>
                             <p className="text-sm">Structured interviews predict performance <span className="font-bold underline">2x better</span> than unstructured ones.</p>
                         </StickyNote>
@@ -143,7 +143,7 @@ export function FeaturesBento() {
                         title="Instant Feedback"
                         description="AI summarizes the interview highlights and red flags immediately after you finish."
                         icon={Zap}
-                        className="bg-[#FAF5FF]" // Purple tint
+                        className="bg-[#ECFDF5]" // Green tint (replaced Purple)
                     />
                 </div>
 

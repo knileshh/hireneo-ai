@@ -8,7 +8,7 @@ import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 export function Navbar() {
     return (
         <nav className="sticky top-4 z-50 mx-auto max-w-7xl px-4">
-            <div className="bg-cream/80 backdrop-blur-md border border-black/5 rounded-full px-6 py-3 flex items-center justify-between shadow-sm">
+            <div className="bg-[#FFFFF0] border-2 border-dashed border-black/10 rounded-2xl px-6 py-3 flex items-center justify-between shadow-sm">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2">
                     <div className="bg-primary text-primary-foreground font-heading font-bold h-10 w-10 flex items-center justify-center rounded-xl text-xl">
