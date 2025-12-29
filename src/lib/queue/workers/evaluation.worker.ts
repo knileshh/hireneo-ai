@@ -7,10 +7,18 @@ import { eq } from 'drizzle-orm';
 import { logger } from '@/lib/logger';
 import { env } from '@/lib/env';
 
-const connection = {
-    host: env.REDIS_HOST,
-    port: env.REDIS_PORT,
-};
+// Use Upstash if configured, otherwise fall back to local Redis
+const connection = env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN
+    ? {
+        host: new URL(env.UPSTASH_REDIS_REST_URL).hostname,
+        port: 6379,
+        password: env.UPSTASH_REDIS_REST_TOKEN,
+        tls: {},
+    }
+    : {
+        host: env.REDIS_HOST,
+        port: env.REDIS_PORT,
+    };
 
 /**
  * Evaluation worker - processes AI-powered interview evaluations

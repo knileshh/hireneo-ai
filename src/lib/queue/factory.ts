@@ -1,10 +1,19 @@
 import { Queue } from 'bullmq';
 import { env } from '@/lib/env';
 
-const connection = {
-    host: env.REDIS_HOST,
-    port: env.REDIS_PORT,
-};
+// Use Upstash if configured, otherwise fall back to local Redis
+const connection = env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN
+    ? {
+        // Extract hostname from REST URL (remove https:// and any path)
+        host: new URL(env.UPSTASH_REDIS_REST_URL).hostname,
+        port: 6379, // Upstash standard port with TLS
+        password: env.UPSTASH_REDIS_REST_TOKEN,
+        tls: {}, // Enable TLS for Upstash
+    }
+    : {
+        host: env.REDIS_HOST,
+        port: env.REDIS_PORT,
+    };
 
 // Email job data
 export interface EmailJobData {
@@ -14,6 +23,14 @@ export interface EmailJobData {
     interviewerEmail: string;
     scheduledAt: string;
     meetingLink?: string;
+}
+
+// Welcome email job data
+export interface WelcomeEmailJobData {
+    userId: string;
+    userEmail: string;
+    userName: string;
+    userRole: 'candidate' | 'recruiter';
 }
 
 // Evaluation job data
@@ -33,6 +50,20 @@ export interface ReminderJobData {
 
 // Email queue for interview confirmations
 export const emailQueue = new Queue<EmailJobData>('email', {
+    connection,
+    defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+            type: 'exponential',
+            delay: 5000,
+        },
+        removeOnComplete: 100,
+        removeOnFail: 1000,
+    },
+});
+
+// Welcome email queue for new user signups
+export const welcomeEmailQueue = new Queue<WelcomeEmailJobData>('welcome-email', {
     connection,
     defaultJobOptions: {
         attempts: 3,
