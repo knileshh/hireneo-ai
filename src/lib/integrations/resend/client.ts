@@ -44,7 +44,7 @@ export const resendClient = {
 
     try {
       // Use verified domain for sending emails
-      const fromAddress = 'HireNeo AI <noreply@mail.knileshh.com>';
+      const fromAddress = 'HireNeo AI <noreply@updates.hireneo-ai.xyz>';
 
       const result = await resend.emails.send({
         from: fromAddress,
@@ -129,71 +129,7 @@ export const resendClient = {
     }, 'Sending welcome email');
 
     try {
-      const fromAddress = 'HireNeo AI <noreply@mail.knileshh.com>';
-
-      const result = await resend.emails.send({
-        from: fromAddress,
-        to: [to],
-        subject: 'Welcome to HireNeo AI - Let\'s Transform Your Hiring! 🚀',
-        html: generateWelcomeEmailHtml({
-          userName,
-          userRole,
-        }),
-      });
-
-      if (result.error) {
-        throw new ResendError(
-          result.error.message,
-          undefined,
-          result.error
-        );
-      }
-
-      logger.info({
-        emailId: result.data?.id,
-        to,
-      }, 'Welcome email sent successfully');
-
-      return result;
-
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error({
-        to,
-        userName,
-        error: errorMessage,
-      }, 'Failed to send welcome email');
-
-      if (error instanceof ResendError) {
-        throw error;
-      }
-
-      throw new ResendError(
-        `Failed to send welcome email: ${errorMessage}`,
-        500,
-        error
-      );
-    }
-  },
-
-  /**
-   * Send welcome email to new user
-   */
-  async sendWelcomeEmail(params: {
-    to: string;
-    userName: string;
-    userRole: 'candidate' | 'recruiter';
-  }) {
-    const { to, userName, userRole } = params;
-
-    logger.info({
-      to,
-      userName,
-      userRole,
-    }, 'Sending welcome email');
-
-    try {
-      const fromAddress = 'HireNeo AI <noreply@mail.knileshh.com>';
+      const fromAddress = 'HireNeo AI <noreply@updates.hireneo-ai.xyz>';
 
       const result = await resend.emails.send({
         from: fromAddress,
@@ -259,7 +195,7 @@ export const resendClient = {
     }, 'Sending assessment invite email');
 
     try {
-      const fromAddress = 'HireNeo AI <noreply@mail.knileshh.com>';
+      const fromAddress = 'HireNeo AI <noreply@updates.hireneo-ai.xyz>';
 
       const result = await resend.emails.send({
         from: fromAddress,
@@ -463,33 +399,33 @@ function generateWelcomeEmailHtml(params: {
 }): string {
   const { userName, userRole } = params;
 
-  const roleContent = userRole === 'recruiter' 
+  const roleContent = userRole === 'recruiter'
     ? {
-        title: 'Welcome to HireNeo AI',
-        subtitle: 'Transform your hiring process with AI-powered interviews',
-        features: [
-          '🎯 AI-Generated Interview Questions tailored to each role',
-          '🎤 Automated Candidate Assessments with voice/text responses',
-          '📊 Intelligent Scoring & Analytics to identify top talent',
-          '⚡ Streamlined Workflow from job posting to final evaluation',
-          '🔔 Smart Reminders & Notifications for you and candidates',
-        ],
-        cta: 'Create Your First Job',
-        ctaUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/dashboard/jobs`,
-      }
+      title: 'Welcome to HireNeo AI',
+      subtitle: 'Transform your hiring process with AI-powered interviews',
+      features: [
+        '🎯 AI-Generated Interview Questions tailored to each role',
+        '🎤 Automated Candidate Assessments with voice/text responses',
+        '📊 Intelligent Scoring & Analytics to identify top talent',
+        '⚡ Streamlined Workflow from job posting to final evaluation',
+        '🔔 Smart Reminders & Notifications for you and candidates',
+      ],
+      cta: 'Create Your First Job',
+      ctaUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/dashboard/jobs`,
+    }
     : {
-        title: 'Welcome to HireNeo AI',
-        subtitle: 'Get ready for a smarter interview experience',
-        features: [
-          '🎯 Personalized interview questions matched to your skills',
-          '🎤 Flexible response options - type or record your answers',
-          '📊 Instant feedback and detailed performance insights',
-          '⚡ Quick 20-30 minute assessments that fit your schedule',
-          '🔔 Timely notifications to keep you in the loop',
-        ],
-        cta: 'View Opportunities',
-        ctaUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/jobs`,
-      };
+      title: 'Welcome to HireNeo AI',
+      subtitle: 'Get ready for a smarter interview experience',
+      features: [
+        '🎯 Personalized interview questions matched to your skills',
+        '🎤 Flexible response options - type or record your answers',
+        '📊 Instant feedback and detailed performance insights',
+        '⚡ Quick 20-30 minute assessments that fit your schedule',
+        '🔔 Timely notifications to keep you in the loop',
+      ],
+      cta: 'View Opportunities',
+      ctaUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/jobs`,
+    };
 
   return `
     <!DOCTYPE html>
@@ -511,9 +447,9 @@ function generateWelcomeEmailHtml(params: {
           <p style="font-size: 16px; color: #334155;">Welcome to <strong style="color: #1A3305;">HireNeo AI</strong>! 🎉 We're excited to have you on board.</p>
           
           <p style="font-size: 16px; color: #334155; margin-bottom: 24px;">
-            ${userRole === 'recruiter' 
-              ? 'You\'re all set to revolutionize your hiring process. Here\'s what you can do with HireNeo AI:'
-              : 'You\'re all set to showcase your skills through our intelligent interview platform. Here\'s what makes HireNeo AI special:'}
+            ${userRole === 'recruiter'
+      ? 'You\'re all set to revolutionize your hiring process. Here\'s what you can do with HireNeo AI:'
+      : 'You\'re all set to showcase your skills through our intelligent interview platform. Here\'s what makes HireNeo AI special:'}
           </p>
 
           <div style="background: #ECFDF5; padding: 24px; border-radius: 12px; margin: 24px 0; border: 1px solid rgba(26, 51, 5, 0.1);">
