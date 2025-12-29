@@ -348,6 +348,12 @@ export default function JobDetailPage() {
                                             onClick={async (e) => {
                                                 e.stopPropagation();
                                                 try {
+                                                    // If it's already a full URL, open directly
+                                                    if (candidate.resumeUrl!.startsWith('http')) {
+                                                        window.open(candidate.resumeUrl!, '_blank');
+                                                        return;
+                                                    }
+                                                    // Otherwise get signed URL for path
                                                     const res = await fetch(`/api/resume/view?path=${encodeURIComponent(candidate.resumeUrl!)}`);
                                                     const data = await res.json();
                                                     if (data.url) {
