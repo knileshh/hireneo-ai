@@ -56,6 +56,25 @@ export default function JobDetailPage() {
         });
     }, []);
 
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+            alert('File size must be less than 5MB');
+            return;
+        }
+
+        const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('File must be PDF, DOC, or DOCX');
+            return;
+        }
+
+        setSelectedFile(file);
+    };
+
     const { data, isLoading } = useQuery({
         queryKey: ['job', jobId],
         queryFn: async () => {
