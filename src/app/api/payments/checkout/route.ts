@@ -58,12 +58,21 @@ export async function POST(request: NextRequest) {
         console.error('Checkout error details:', {
             message: error?.message,
             status: error?.status,
+            statusCode: error?.statusCode,
             body: error?.body,
+            response: error?.response?.data,
             stack: error?.stack,
         });
+        
+        // Return more specific error message
+        const errorMessage = error?.body?.error?.message || error?.message || 'Failed to create checkout session';
+        
         return NextResponse.json(
-            { error: 'Failed to create checkout session', details: error?.message },
-            { status: 500 }
+            { 
+                error: errorMessage,
+                details: error?.body?.error?.detail || 'Please check your Polar configuration and try again',
+            },
+            { status: error?.statusCode || error?.status || 500 }
         );
     }
 }

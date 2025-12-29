@@ -1,9 +1,14 @@
 import { Polar } from '@polar-sh/sdk';
 
+// Validate Polar configuration
+if (!process.env.POLAR_ACCESS_TOKEN) {
+    console.warn('⚠️  POLAR_ACCESS_TOKEN is not set. Polar integration will not work.');
+}
+
 // Initialize Polar client
+// Note: Polar.sh uses 'production' for the live environment (not 'sandbox')
 export const polar = new Polar({
     accessToken: process.env.POLAR_ACCESS_TOKEN,
-    server: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox',
 });
 
 // Pricing tiers configuration
@@ -71,17 +76,35 @@ export async function createCheckoutSession({
     successUrl: string;
     metadata?: Record<string, string>;
 }) {
-    console.log('Calling Polar checkouts.create with:', { productId, customerEmail, successUrl });
-
-    // Use the checkouts.create method with products array
-    const checkout = await polar.checkouts.create({
-        products: [productId],
+    console.log('🔵 Calling Polar checkouts.create with:', { 
+        productId, 
+        customerEmail, 
         successUrl,
-        customerEmail,
-        customerMetadata: metadata,
+        metadata,
+        hasToken: !!process.env.POLAR_ACCESS_TOKEN,
+        tokenPrefix: process.env.POLAR_ACCESS_TOKEN?.substring(0, 15) + '...',
     });
 
-    return checkout;
+    try {
+        // Use the checkouts.create method with products array
+        const checkout = await polar.checkouts.create({
+            products: [productId],
+            successUrl,
+            customerEmail,
+            metadata,  // Fixed: was 'customerMetadata' which doesn't exist in the API
+        });
+
+        console.log('✅ Checkout created successfully:', checkout.id);
+        return checkout;
+    } catch (error: any) {
+        console.error('❌ Polar API Error:', {
+            message: error?.message,
+            statusCode: error?.statusCode,
+            body: JSON.stringify(error?.body, null, 2),
+            stack: error?.stack?.split('\n').slice(0, 3),
+        });
+        throw error;
+    }
 }
 
 // Helper to get customer subscriptions
