@@ -38,6 +38,10 @@ export default function JobDetailPage() {
     const [user, setUser] = useState<{ id: string; email: string; full_name: string } | null>(null);
     const [resumeText, setResumeText] = useState('');
     const [applied, setApplied] = useState(false);
+    const [uploadMethod, setUploadMethod] = useState<'file' | 'text'>('file');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     useEffect(() => {
         const supabase = createClient();
@@ -63,15 +67,46 @@ export default function JobDetailPage() {
 
     const applyMutation = useMutation({
         mutationFn: async () => {
+            const res = null;
+
+            if (uploadMethod === 'file' && selectedFile) {
+                // Upload file to Supabase
+                setUploadProgress(30);
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+
+                const uploadRes = await fetch('/api/resume/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                setUploadProgress(60);
+
+                if (!uploadRes.ok) {
+                    const error = await uploadRes.json();
+                    throw new Error(error.error || 'Failed to upload resume');
+                }
+
+                const uploadData = await uploadRes.json();
+                resumeUrl = uploadData.resumeUrl;
+
+                // Use the parsed resume from upload
+                setUploadProgress(80);
+            }
+
+            // Submit application
             const res = await fetch(`/api/jobs/${jobId}/candidates`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    resumeText,
+                    resumeText: uploadMethod === 'text' ? resumeText : '',
+                    resumeUrl,
                     name: user?.full_name,
                     email: user?.email,
                 }),
             });
+
+            setUploadProgress(100);
             if (!res.ok) {
                 const err = await res.json();
                 throw new Error(err.error || 'Failed to apply');
@@ -209,29 +244,115 @@ export default function JobDetailPage() {
                                         Apply for this position
                                     </h3>
 
+                                    {/* Tabs for Upload or Paste */}
+                                    <div className="mb-4 flex gap-2 border-b">
+                                        <button
+                                            onClick={() => setUploadMethod('file')}
+                                            className={`pb-2 px-4 text-sm font-medium transition-colors ${uploadMethod === 'file'
+                                                ? 'border-b-2 border-[#1A3305] text-[#1A3305]'
+                                                : 'text-gray-500 hover:text-gray-700'
+                                                }`}
+                                        >
+                                            <Upload className="w-4 h-4 inline mr-1" />
+                                            Upload Resume
+                                        </button>
+                                        <button
+                                            onClick={() => setUploadMethod('text')}
+                                            className={`pb-2 px-4 text-sm font-medium transition-colors ${uploadMethod === 'text'
+                                                ? 'border-b-2 border-[#1A3305] text-[#1A3305]'
+                                                : 'text-gray-500 hover:text-gray-700'
+                                                }`}
+                                        >
+                                            <FileText className="w-4 h-4 inline mr-1" />
+                                            Paste Text
+                                        </button>
+                                    </div>
+
                                     <div className="space-y-4">
-                                        <div>
-                                            <label className="text-sm font-medium">Your Resume</label>
-                                            <textarea
-                                                value={resumeText}
-                                                onChange={(e) => setResumeText(e.target.value)}
-                                                placeholder="Paste your resume or describe your experience..."
-                                                className="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A3305] resize-none h-32"
-                                            />
-                                            <p className="text-xs text-muted-foreground mt-1">
-                                                AI will analyze your resume to match with job requirements
-                                            </p>
-                                        </div>
+                                        {uploadMethod === 'file' ? (
+                                            <>
+                                                <div>
+                                                    <label className="text-sm font-medium">Upload your resume</label>
+                                                    <div className="mt-2">
+                                                        <div className="flex items-center justify-center w-full">
+                                                            <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                                                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                                                    {selectedFile ? (
+                                                                        <>
+                                                                            <CheckCircle className="w-8 h-8 mb-2 text-green-600" />
+                                                                            <p className="mb-2 text-sm text-gray-700">
+                                                                                <span className="font-semibold">{selectedFile.name}</span>
+                                                                            </p>
+                                                                            <p className="text-xs text-gray-500">
+                                                                                {(selectedFile.size / 1024).toFixed(1)} KB
+                                                                            </p>
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <Upload className="w-8 h-8 mb-2 text-gray-400" />
+                                                                            <p className="mb-2 text-sm text-gray-500">
+                                                                                <span className="font-semibold">Click to upload</span> or drag and drop
+                                                                            </p>
+                                                                            <p className="text-xs text-gray-500">PDF, DOC, or DOCX (max 5MB)</p>
+                                                                        </>
+                                                                    )}
+                                                                </div>
+                                                                <input
+                                                                    type="file"
+                                                                    className="hidden"
+                                                                    accept=".pdf,.doc,.docx"
+                                                                    onChange={handleFileSelect}
+                                                                />
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    {selectedFile && (
+                                                        <button
+                                                            onClick={() => setSelectedFile(null)}
+                                                            className="mt-2 text-sm text-red-600 hover:text-red-700"
+                                                        >
+                                                            Remove file
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                {uploadProgress > 0 && uploadProgress < 100 && (
+                                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                                        <div
+                                                            className="bg-[#1A3305] h-2 rounded-full transition-all"
+                                                            style={{ width: `${uploadProgress}%` }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <div>
+                                                <label className="text-sm font-medium">Your Resume</label>
+                                                <textarea
+                                                    value={resumeText}
+                                                    onChange={(e) => setResumeText(e.target.value)}
+                                                    placeholder="Paste your resume or describe your experience..."
+                                                    className="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1A3305] resize-none h-32"
+                                                />
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    AI will analyze your resume to match with job requirements
+                                                </p>
+                                            </div>
+                                        )}
 
                                         <Button
                                             onClick={() => applyMutation.mutate()}
-                                            disabled={!resumeText.trim() || applyMutation.isPending}
+                                            disabled={
+                                                (uploadMethod === 'file' && !selectedFile) ||
+                                                (uploadMethod === 'text' && !resumeText.trim()) ||
+                                                applyMutation.isPending ||
+                                                isUploading
+                                            }
                                             className="w-full bg-[#1A3305] hover:bg-[#1A3305]/90"
                                         >
-                                            {applyMutation.isPending ? (
+                                            {applyMutation.isPending || isUploading ? (
                                                 <>
                                                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                                    Submitting...
+                                                    {isUploading ? 'Uploading...' : 'Submitting...'}
                                                 </>
                                             ) : (
                                                 'Submit Application'
