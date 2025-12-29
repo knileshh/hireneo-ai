@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { uploadResume } from '@/lib/supabase/storage';
-import { extractTextFromFile } from '@/lib/utils/file-parser';
-import { parseResumeWithAI } from '@/lib/integrations/openai/resume-parser';
-import { db } from '@/lib/db';
-import { candidateProfiles } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { ResumeService } from '@/lib/services/resume.service';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
     try {
@@ -49,63 +45,23 @@ export async function POST(request: NextRequest) {
         // Convert file to buffer
         const buffer = Buffer.from(await file.arrayBuffer());
 
-        // Upload to Supabase Storage
-        let resumeUrl: string;
-        try {
-            resumeUrl = await uploadResume(buffer, file.name, user.id);
-        } catch (uploadError: any) {
-            console.error('Storage upload error:', uploadError);
-            return NextResponse.json(
-                { error: `Storage error: ${uploadError.message}` },
-                { status: 500 }
-            );
-        }
-
-        // Try to extract text and parse with AI (optional - don't fail if this breaks)
-        let parsedResume = null;
-        try {
-            const resumeText = await extractTextFromFile(buffer, file.name);
-            parsedResume = await parseResumeWithAI(resumeText);
-        } catch (parseError) {
-            console.error('Resume parsing error (non-fatal):', parseError);
-            // Continue without parsed resume - user can still apply
-        }
-
-        // Save or update candidate profile
-        try {
-            const existingProfile = await db.query.candidateProfiles.findFirst({
-                where: eq(candidateProfiles.userId, user.id),
-            });
-
-            if (existingProfile) {
-                await db.update(candidateProfiles)
-                    .set({
-                        resumeUrl,
-                        parsedResume,
-                        updatedAt: new Date(),
-                    })
-                    .where(eq(candidateProfiles.userId, user.id));
-            } else {
-                await db.insert(candidateProfiles).values({
-                    userId: user.id,
-                    name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
-                    email: user.email!,
-                    resumeUrl,
-                    parsedResume,
-                });
-            }
-        } catch (dbError: any) {
-            console.error('Database error:', dbError);
-            // Resume is uploaded, just profile save failed - still return success
-        }
+        // Process with service
+        const result = await ResumeService.processAndSaveResume(
+            user.id,
+            buffer,
+            file.name,
+            user.email!,
+            user.user_metadata?.full_name
+        );
 
         return NextResponse.json({
             success: true,
-            resumeUrl,
-            parsedResume,
+            resumeUrl: result.resumeUrl,
+            parsedResume: result.parsedResume,
         });
+
     } catch (error: any) {
-        console.error('Resume upload error:', error);
+        logger.error({ error }, 'Resume upload error');
         return NextResponse.json(
             { error: error.message || 'Failed to upload resume' },
             { status: 500 }
@@ -125,10 +81,7 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // Get candidate profile
-        const profile = await db.query.candidateProfiles.findFirst({
-            where: eq(candidateProfiles.userId, user.id),
-        });
+        const profile = await ResumeService.getProfile(user.id);
 
         if (!profile) {
             return NextResponse.json(
@@ -147,7 +100,7 @@ export async function GET(request: NextRequest) {
             },
         });
     } catch (error: any) {
-        console.error('Get profile error:', error);
+        logger.error({ error }, 'Get profile error');
         return NextResponse.json(
             { error: error.message || 'Failed to get profile' },
             { status: 500 }
