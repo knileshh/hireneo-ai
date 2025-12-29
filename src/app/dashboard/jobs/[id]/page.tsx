@@ -20,9 +20,10 @@ import {
     Sparkles,
     FileText,
     ExternalLink,
+    Trash2,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 interface Candidate {
     id: string;
@@ -57,6 +58,7 @@ interface Job {
 
 export default function JobDetailPage() {
     const params = useParams();
+    const router = useRouter();
     const jobId = params.id as string;
     const queryClient = useQueryClient();
 
@@ -118,6 +120,23 @@ export default function JobDetailPage() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['job', jobId] });
+        },
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: async () => {
+            const res = await fetch(`/api/jobs/${jobId}`, {
+                method: 'DELETE',
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Failed to delete job');
+            }
+            return res.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['jobs'] });
+            router.push('/dashboard/jobs');
         },
     });
 
@@ -209,18 +228,37 @@ export default function JobDetailPage() {
                     </div>
                 </div>
 
-                <Button
-                    onClick={() => rankMutation.mutate()}
-                    disabled={rankMutation.isPending || candidates.length === 0}
-                    className="bg-[#1A3305] hover:bg-[#1A3305]/90"
-                >
-                    {rankMutation.isPending ? (
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    ) : (
-                        <Sparkles className="w-4 h-4 mr-2" />
-                    )}
-                    AI Rank Candidates
-                </Button>
+                <div className="flex gap-2">
+                    <Button
+                        onClick={() => rankMutation.mutate()}
+                        disabled={rankMutation.isPending || candidates.length === 0}
+                        className="bg-[#1A3305] hover:bg-[#1A3305]/90"
+                    >
+                        {rankMutation.isPending ? (
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                            <Sparkles className="w-4 h-4 mr-2" />
+                        )}
+                        AI Rank Candidates
+                    </Button>
+                    <Button
+                        variant="outline"
+                        onClick={() => {
+                            if (confirm('Are you sure you want to delete this job? This will also delete all candidates.')) {
+                                deleteMutation.mutate();
+                            }
+                        }}
+                        disabled={deleteMutation.isPending}
+                        className="border-red-500 text-red-500 hover:bg-red-50"
+                    >
+                        {deleteMutation.isPending ? (
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                            <Trash2 className="w-4 h-4 mr-2" />
+                        )}
+                        Delete Job
+                    </Button>
+                </div>
             </div>
 
             {/* Requirements */}
