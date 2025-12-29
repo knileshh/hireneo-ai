@@ -1,8 +1,7 @@
-import * as pdfParseModule from 'pdf-parse';
+// pdf-parse is a CommonJS module, use require
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const pdfParse = require('pdf-parse');
 import mammoth from 'mammoth';
-
-// pdf-parse exports a function as default
-const pdfParse = (pdfParseModule as any).default || pdfParseModule;
 
 /**
  * Extract text from a PDF file
