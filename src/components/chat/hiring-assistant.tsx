@@ -16,6 +16,7 @@ import {
     Expand
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 type ChatSize = 'normal' | 'large' | 'fullscreen';
 
@@ -150,8 +151,8 @@ export function HiringAssistantChat() {
                                 )}
                                 <div
                                     className={`rounded-2xl px-4 py-3 ${message.role === 'user'
-                                            ? 'bg-[#1A3305] text-white max-w-[85%]'
-                                            : 'bg-gray-50 text-gray-900 max-w-[90%] border border-gray-100'
+                                        ? 'bg-[#1A3305] text-white max-w-[85%]'
+                                        : 'bg-gray-50 text-gray-900 max-w-[90%] border border-gray-100'
                                         }`}
                                 >
                                     {message.role === 'assistant' ? (
@@ -170,7 +171,7 @@ export function HiringAssistantChat() {
                                             prose-blockquote:border-l-4 prose-blockquote:border-[#1A3305] prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600
                                             prose-hr:my-4 prose-hr:border-gray-200
                                         ">
-                                            <ReactMarkdown>{message.content}</ReactMarkdown>
+                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
                                         </div>
                                     ) : (
                                         <p className="text-sm leading-relaxed">{message.content}</p>

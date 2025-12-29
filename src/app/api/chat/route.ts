@@ -28,13 +28,21 @@ export async function POST(req: Request) {
         
 Your role is to help recruiters and hiring managers:
 - Search and filter candidates
-- Compare candidate evaluations
+- Compare candidate evaluations  
 - Provide insights on interview performance
 - Answer questions about hiring data
 
+IMPORTANT FORMATTING RULES:
+1. When presenting multiple candidates, ALWAYS use a markdown table with columns like: Name, Role, Status, Score
+2. Format dates as "Dec 29, 2024" not ISO strings
+3. Use bold for candidate names and important values
+4. Use status badges like: ✅ Evaluated, ⏳ Scheduled, 🔄 In Progress, ⏸️ Pending
+5. When showing stats, use a clear list format with emoji icons
+6. For scores, show as "85/100" format
+7. Keep responses concise but informative
+
 When asked about candidates, use the available tools to query the database.
-Be concise and helpful. Format responses with markdown for readability.
-When presenting candidate data, use tables or bullet points.`,
+After receiving tool results, format them nicely using markdown tables and lists.`,
             messages,
             tools: {
                 searchCandidates: tool({
@@ -71,19 +79,36 @@ When presenting candidate data, use tables or bullet points.`,
                             const evaluation = await db.query.evaluations.findFirst({
                                 where: eq(evaluations.interviewId, interview.id),
                             });
+
+                            // Format date nicely
+                            const scheduledDate = interview.scheduledAt
+                                ? new Date(interview.scheduledAt).toLocaleDateString('en-US', {
+                                    month: 'short', day: 'numeric', year: 'numeric'
+                                })
+                                : 'Not scheduled';
+
                             return {
                                 id: interview.id,
                                 name: interview.candidateName,
                                 email: interview.candidateEmail,
-                                jobRole: interview.jobRole,
+                                role: interview.jobRole,
+                                level: interview.jobLevel,
                                 status: interview.status,
-                                scheduledAt: interview.scheduledAt,
-                                score: evaluation?.score,
-                                recommendation: evaluation?.recommendation,
+                                scheduledDate,
+                                score: evaluation?.score ?? null,
+                                scoreDisplay: evaluation?.score ? `${evaluation.score}/100` : 'Not evaluated',
+                                recommendation: evaluation?.recommendation ?? 'Pending',
+                                summary: evaluation?.summary ?? null,
                             };
                         }));
 
-                        return { candidates: data, count: data.length };
+                        return {
+                            candidates: data,
+                            totalFound: data.length,
+                            message: data.length > 0
+                                ? `Found ${data.length} candidate(s). Present this data in a markdown table.`
+                                : 'No candidates found matching your criteria.'
+                        };
                     },
                 }),
 
@@ -98,7 +123,7 @@ When presenting candidate data, use tables or bullet points.`,
                         });
 
                         if (!interview) {
-                            return { error: 'Candidate not found' };
+                            return { error: 'Candidate not found', message: 'No candidate exists with that ID.' };
                         }
 
                         const evaluation = await db.query.evaluations.findFirst({
@@ -110,28 +135,36 @@ When presenting candidate data, use tables or bullet points.`,
                             orderBy: (r, { asc }) => [asc(r.questionIndex)],
                         });
 
+                        const scheduledDate = interview.scheduledAt
+                            ? new Date(interview.scheduledAt).toLocaleDateString('en-US', {
+                                month: 'short', day: 'numeric', year: 'numeric'
+                            })
+                            : 'Not scheduled';
+
                         return {
                             candidate: {
                                 name: interview.candidateName,
                                 email: interview.candidateEmail,
-                                jobRole: interview.jobRole,
-                                jobLevel: interview.jobLevel,
+                                role: interview.jobRole,
+                                level: interview.jobLevel,
                                 status: interview.status,
-                                scheduledAt: interview.scheduledAt,
+                                scheduledDate,
                             },
                             evaluation: evaluation ? {
                                 score: evaluation.score,
+                                scoreDisplay: `${evaluation.score}/100`,
                                 summary: evaluation.summary,
                                 strengths: evaluation.strengths,
                                 risks: evaluation.risks,
                                 recommendation: evaluation.recommendation,
-                            } : null,
-                            responses: responses.map(r => ({
+                            } : { message: 'Not yet evaluated' },
+                            responses: responses.length > 0 ? responses.map(r => ({
                                 question: r.question,
                                 category: r.category,
-                                answer: r.transcript || r.textAnswer,
-                                duration: r.durationSeconds,
-                            })),
+                                answer: r.transcript || r.textAnswer || 'No answer provided',
+                                durationSeconds: r.durationSeconds,
+                            })) : [],
+                            totalResponses: responses.length,
                         };
                     },
                 }),
