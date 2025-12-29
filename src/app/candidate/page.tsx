@@ -29,11 +29,14 @@ interface UserProfile {
 
 interface Application {
     id: string;
+    jobId: string;
     jobTitle: string;
     company: string;
-    status: 'PENDING' | 'SHORTLISTED' | 'INVITED' | 'COMPLETED' | 'REJECTED';
+    status: 'NEW' | 'PENDING' | 'SHORTLISTED' | 'INVITED' | 'COMPLETED' | 'REJECTED';
     appliedAt: string;
     matchScore?: number;
+    interviewId?: string;
+    invitedAt?: string;
 }
 
 export default function CandidateDashboard() {
@@ -66,9 +69,15 @@ export default function CandidateDashboard() {
             });
             setLoading(false);
 
-            // TODO: Fetch applications from API
-            // For now, use mock data
-            setApplications([]);
+            // Fetch applications from API
+            fetch('/api/candidate/applications')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.applications) {
+                        setApplications(data.applications);
+                    }
+                })
+                .catch(err => console.error('Failed to fetch applications:', err));
         });
     }, [router]);
 
