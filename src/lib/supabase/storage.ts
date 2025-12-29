@@ -33,12 +33,28 @@ export async function uploadResume(
         throw new Error(`Failed to upload resume: ${error.message}`);
     }
 
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-        .from(RESUME_BUCKET)
-        .getPublicUrl(data.path);
+    // Return the file path (we'll generate signed URLs on demand)
+    return data.path;
+}
 
-    return publicUrl;
+/**
+ * Get a signed URL for a resume file (valid for 1 hour)
+ * @param filePath - Path to the file in storage
+ * @returns Signed URL for temporary access
+ */
+export async function getSignedResumeUrl(filePath: string): Promise<string> {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase.storage
+        .from(RESUME_BUCKET)
+        .createSignedUrl(filePath, 3600); // 1 hour expiry
+
+    if (error) {
+        console.error('Signed URL error:', error);
+        throw new Error(`Failed to get resume URL: ${error.message}`);
+    }
+
+    return data.signedUrl;
 }
 
 /**

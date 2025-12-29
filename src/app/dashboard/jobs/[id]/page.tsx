@@ -345,9 +345,20 @@ export default function JobDetailPage() {
                                         <Button
                                             size="sm"
                                             variant="outline"
-                                            onClick={(e) => {
+                                            onClick={async (e) => {
                                                 e.stopPropagation();
-                                                window.open(candidate.resumeUrl!, '_blank');
+                                                try {
+                                                    const res = await fetch(`/api/resume/view?path=${encodeURIComponent(candidate.resumeUrl!)}`);
+                                                    const data = await res.json();
+                                                    if (data.url) {
+                                                        window.open(data.url, '_blank');
+                                                    } else {
+                                                        alert('Failed to load resume');
+                                                    }
+                                                } catch (err) {
+                                                    console.error('Error viewing resume:', err);
+                                                    alert('Failed to load resume');
+                                                }
                                             }}
                                             className="border-[#1A3305] text-[#1A3305] hover:bg-[#1A3305]/10"
                                         >
