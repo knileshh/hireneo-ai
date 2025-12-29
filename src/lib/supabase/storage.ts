@@ -33,8 +33,12 @@ export async function uploadResume(
         throw new Error(`Failed to upload resume: ${error.message}`);
     }
 
-    // Return the file path (we'll generate signed URLs on demand)
-    return data.path;
+    // Return public URL (bucket is public)
+    const { data: { publicUrl } } = supabase.storage
+        .from(RESUME_BUCKET)
+        .getPublicUrl(data.path);
+
+    return publicUrl;
 }
 
 /**
