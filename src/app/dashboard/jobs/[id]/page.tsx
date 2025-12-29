@@ -17,7 +17,9 @@ import {
     Check,
     AlertCircle,
     Trophy,
-    Sparkles
+    Sparkles,
+    FileText,
+    ExternalLink,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -33,6 +35,7 @@ interface Candidate {
         gaps: string[];
         recommendation: string;
     } | null;
+    resumeUrl: string | null;
     status: string;
     parsedResume: {
         summary: string;
@@ -336,6 +339,22 @@ export default function JobDetailPage() {
 
                                     {/* Status */}
                                     {getStatusBadge(candidate.status)}
+
+                                    {/* View Resume */}
+                                    {candidate.resumeUrl && (
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                window.open(candidate.resumeUrl!, '_blank');
+                                            }}
+                                            className="border-[#1A3305] text-[#1A3305] hover:bg-[#1A3305]/10"
+                                        >
+                                            <FileText className="w-4 h-4 mr-1" />
+                                            View Resume
+                                        </Button>
+                                    )}
 
                                     {/* Actions */}
                                     {candidate.status === 'NEW' && (
