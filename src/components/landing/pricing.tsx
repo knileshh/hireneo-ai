@@ -1,9 +1,60 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 export function Pricing() {
+    const router = useRouter();
+    const [loadingTier, setLoadingTier] = useState<string | null>(null);
+
+    const handleSubscribe = async (tierId: string) => {
+        if (tierId === 'free') {
+            router.push('/signup');
+            return;
+        }
+
+        if (tierId === 'enterprise') {
+            window.location.href = 'mailto:sales@hireneo.ai?subject=Enterprise Plan Inquiry';
+            return;
+        }
+
+        // Check if user is logged in
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            router.push(`/login?redirectTo=/pricing`);
+            return;
+        }
+
+        setLoadingTier(tierId);
+
+        try {
+            const res = await fetch('/api/payments/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tier: tierId }),
+            });
+
+            const data = await res.json();
+
+            if (data.checkoutUrl) {
+                window.location.href = data.checkoutUrl;
+            } else {
+                console.error('Checkout error:', data.error);
+                alert('Failed to start checkout. Please try again.');
+            }
+        } catch (error) {
+            console.error('Checkout error:', error);
+            alert('Failed to start checkout. Please try again.');
+        } finally {
+            setLoadingTier(null);
+        }
+    };
+
     return (
         <section className="py-20 px-4 relative overflow-hidden bg-[#FAFAF9]" id="pricing">
             {/* Background Glows to blend with page */}
@@ -65,8 +116,13 @@ export function Pricing() {
                                 ))}
                             </div>
 
-                            <Button variant="outline" className="w-full bg-white hover:bg-slate-50 border-slate-200 text-slate-900 h-10 rounded-xl text-sm font-medium transition-transform hover:scale-[1.02] relative z-30">
-                                Start Free
+                            <Button
+                                variant="outline"
+                                onClick={() => handleSubscribe('free')}
+                                disabled={loadingTier === 'free'}
+                                className="w-full bg-white hover:bg-slate-50 border-slate-200 text-slate-900 h-10 rounded-xl text-sm font-medium transition-transform hover:scale-[1.02] relative z-30"
+                            >
+                                {loadingTier === 'free' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Start Free'}
                             </Button>
                         </div>
                     </div>
@@ -115,8 +171,12 @@ export function Pricing() {
                                 ))}
                             </div>
 
-                            <Button className="w-full bg-[#1A3305] hover:bg-[#1A3305]/90 text-white h-12 rounded-xl text-base font-bold shadow-lg shadow-[#1A3305]/20 transition-transform hover:scale-[1.02] relative z-30">
-                                Launch Journey
+                            <Button
+                                onClick={() => handleSubscribe('pro')}
+                                disabled={loadingTier === 'pro'}
+                                className="w-full bg-[#1A3305] hover:bg-[#1A3305]/90 text-white h-12 rounded-xl text-base font-bold shadow-lg shadow-[#1A3305]/20 transition-transform hover:scale-[1.02] relative z-30"
+                            >
+                                {loadingTier === 'pro' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Launch Journey'}
                             </Button>
                         </div>
                     </div>
@@ -159,8 +219,13 @@ export function Pricing() {
                                 ))}
                             </div>
 
-                            <Button variant="outline" className="w-full bg-white hover:bg-slate-50 border-slate-200 text-slate-900 h-10 rounded-xl text-sm font-medium transition-transform hover:scale-[1.02] relative z-30">
-                                Contact Sales
+                            <Button
+                                variant="outline"
+                                onClick={() => handleSubscribe('enterprise')}
+                                disabled={loadingTier === 'enterprise'}
+                                className="w-full bg-white hover:bg-slate-50 border-slate-200 text-slate-900 h-10 rounded-xl text-sm font-medium transition-transform hover:scale-[1.02] relative z-30"
+                            >
+                                {loadingTier === 'enterprise' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Contact Sales'}
                             </Button>
                         </div>
                     </div>
@@ -174,3 +239,4 @@ export function Pricing() {
         </section>
     );
 }
+
