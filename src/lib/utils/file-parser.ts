@@ -1,18 +1,24 @@
-// pdf-parse is a CommonJS module, use require
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require('pdf-parse');
 import mammoth from 'mammoth';
 
 /**
  * Extract text from a PDF file
+ * Uses dynamic import for pdf-parse to handle module issues
  */
 export async function extractTextFromPdf(buffer: Buffer): Promise<string> {
     try {
+        // Dynamic import for pdf-parse
+        const pdfParseModule = await import('pdf-parse');
+        const pdfParse = (pdfParseModule as any).default || pdfParseModule;
         const data = await pdfParse(buffer);
-        return data.text;
-    } catch (error) {
-        console.error('PDF parsing error:', error);
-        throw new Error('Failed to extract text from PDF');
+        return data.text || '';
+    } catch (error: any) {
+        console.error('PDF parsing error details:', {
+            name: error?.name,
+            message: error?.message,
+            code: error?.code,
+        });
+        // Return empty string instead of throwing - let the app continue
+        return '';
     }
 }
 
