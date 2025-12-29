@@ -21,6 +21,7 @@ import {
     FileText,
     ExternalLink,
     Trash2,
+    Wand2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -137,6 +138,25 @@ export default function JobDetailPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['jobs'] });
             router.push('/dashboard/jobs');
+        },
+    });
+
+    const batchInviteMutation = useMutation({
+        mutationFn: async (count: number) => {
+            const res = await fetch(`/api/jobs/${jobId}/candidates/batch-invite`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ count }),
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Failed to batch invite');
+            }
+            return res.json();
+        },
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: ['job', jobId] });
+            alert(data.message);
         },
     });
 
@@ -257,6 +277,23 @@ export default function JobDetailPage() {
                             <Trash2 className="w-4 h-4 mr-2" />
                         )}
                         Delete Job
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            const count = prompt('How many top candidates do you want to invite?', '3');
+                            if (count && !isNaN(parseInt(count))) {
+                                batchInviteMutation.mutate(parseInt(count));
+                            }
+                        }}
+                        disabled={batchInviteMutation.isPending || candidates.length === 0}
+                        className="bg-purple-600 hover:bg-purple-700"
+                    >
+                        {batchInviteMutation.isPending ? (
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                            <Wand2 className="w-4 h-4 mr-2" />
+                        )}
+                        AI Invite Top N
                     </Button>
                 </div>
             </div>

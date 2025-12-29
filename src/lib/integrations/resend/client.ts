@@ -243,6 +243,74 @@ export const resendClient = {
       );
     }
   },
+
+  /**
+   * Send new job notification email to candidates
+   */
+  async sendNewJobNotification(params: {
+    to: string;
+    candidateName: string;
+    jobTitle: string;
+    jobUrl: string;
+    company?: string;
+  }) {
+    const { to, candidateName, jobTitle, jobUrl, company } = params;
+
+    logger.info({
+      to,
+      candidateName,
+      jobTitle,
+    }, 'Sending new job notification email');
+
+    try {
+      const fromAddress = 'HireNeo AI <noreply@updates.hireneo-ai.xyz>';
+
+      const result = await resend.emails.send({
+        from: fromAddress,
+        to: [to],
+        subject: `New Opportunity: ${jobTitle} - Apply Now!`,
+        html: generateNewJobEmailHtml({
+          candidateName,
+          jobTitle,
+          jobUrl,
+          company,
+        }),
+      });
+
+      if (result.error) {
+        throw new ResendError(
+          result.error.message,
+          undefined,
+          result.error
+        );
+      }
+
+      logger.info({
+        emailId: result.data?.id,
+        to,
+      }, 'New job notification sent successfully');
+
+      return result;
+
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logger.error({
+        to,
+        candidateName,
+        error: errorMessage,
+      }, 'Failed to send new job notification');
+
+      if (error instanceof ResendError) {
+        throw error;
+      }
+
+      throw new ResendError(
+        `Failed to send new job notification: ${errorMessage}`,
+        500,
+        error
+      );
+    }
+  },
 };
 
 /**
@@ -485,6 +553,65 @@ function generateWelcomeEmailHtml(params: {
           <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
             <p style="font-size: 14px; color: #94a3b8; margin: 0;">
               Happy ${userRole === 'recruiter' ? 'hiring' : 'interviewing'}! 🌟<br/>
+              The <strong style="color: #1A3305;">HireNeo AI</strong> Team
+            </p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+}
+
+/**
+ * Generate HTML template for new job notification email
+ */
+function generateNewJobEmailHtml(params: {
+  candidateName: string;
+  jobTitle: string;
+  jobUrl: string;
+  company?: string;
+}): string {
+  const { candidateName, jobTitle, jobUrl, company } = params;
+
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>New Job Opportunity</title>
+      </head>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #FAFAF9;">
+        <div style="background: linear-gradient(135deg, #1A3305 0%, #2D5A0A 100%); padding: 40px 30px; border-radius: 12px 12px 0 0; text-align: center;">
+          <div style="width: 64px; height: 64px; background: white; border-radius: 16px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 32px;">💼</div>
+          <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">New Opportunity!</h1>
+          <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 16px;">A job that matches your profile</p>
+        </div>
+        
+        <div style="background: white; padding: 40px 30px; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0; border-top: none;">
+          <p style="font-size: 16px; color: #334155; margin-top: 0;">Hi ${candidateName},</p>
+          <p style="font-size: 16px; color: #334155;">
+            Great news! A new position has been posted that might be perfect for you:
+          </p>
+
+          <div style="background: #ECFDF5; padding: 24px; border-radius: 12px; margin: 24px 0; border: 1px solid rgba(26, 51, 5, 0.1); text-align: center;">
+            <h2 style="margin: 0 0 8px 0; color: #1A3305; font-size: 24px;">${jobTitle}</h2>
+            ${company ? `<p style="margin: 0; color: #64748b; font-size: 14px;">at ${company}</p>` : ''}
+          </div>
+
+          <div style="text-align: center; margin: 32px 0;">
+            <a href="${jobUrl}" style="display: inline-block; background: #1A3305; color: white; padding: 16px 32px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(26, 51, 5, 0.2);">
+              View Job & Apply →
+            </a>
+          </div>
+
+          <p style="font-size: 14px; color: #64748b; margin-top: 32px;">
+            Don't miss out on this opportunity! The position might fill quickly.
+          </p>
+          
+          <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
+            <p style="font-size: 14px; color: #94a3b8; margin: 0;">
+              Good luck! 🍀<br/>
               The <strong style="color: #1A3305;">HireNeo AI</strong> Team
             </p>
           </div>

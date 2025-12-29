@@ -50,6 +50,18 @@ export default function SignupPage() {
             return;
         }
 
+        // Send welcome email
+        try {
+            await fetch('/api/email/welcome', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, name, role }),
+            });
+        } catch (emailError) {
+            console.error('Failed to send welcome email:', emailError);
+            // Don't block signup if email fails
+        }
+
         setSuccess(true);
         setIsLoading(false);
     };
