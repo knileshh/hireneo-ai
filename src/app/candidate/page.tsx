@@ -97,6 +97,7 @@ export default function CandidateDashboard() {
 
     const getStatusBadge = (status: Application['status']) => {
         const styles = {
+            NEW: 'bg-yellow-100 text-yellow-700',
             PENDING: 'bg-gray-100 text-gray-600',
             SHORTLISTED: 'bg-purple-100 text-purple-700',
             INVITED: 'bg-blue-100 text-blue-700',
@@ -104,6 +105,7 @@ export default function CandidateDashboard() {
             REJECTED: 'bg-red-100 text-red-700',
         };
         const labels = {
+            NEW: 'Applied',
             PENDING: 'Under Review',
             SHORTLISTED: 'Shortlisted',
             INVITED: 'Assessment Invited',
