@@ -34,30 +34,54 @@ export async function updateSession(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser();
 
-    // Protected routes - redirect to login if not authenticated
-    const protectedPaths = ['/dashboard'];
-    const isProtectedPath = protectedPaths.some(path =>
-        request.nextUrl.pathname.startsWith(path)
-    );
+    const pathname = request.nextUrl.pathname;
 
-    if (isProtectedPath && !user) {
+    // Protected routes for recruiters
+    const recruiterPaths = ['/dashboard'];
+    const isRecruiterPath = recruiterPaths.some(path => pathname.startsWith(path));
+
+    // Protected routes for candidates 
+    const candidatePaths = ['/candidate'];
+    const isCandidatePath = candidatePaths.some(path => pathname.startsWith(path));
+
+    // Redirect to login if accessing protected route without auth
+    if ((isRecruiterPath || isCandidatePath) && !user) {
         const url = request.nextUrl.clone();
         url.pathname = '/login';
-        url.searchParams.set('redirectTo', request.nextUrl.pathname);
+        url.searchParams.set('redirectTo', pathname);
         return NextResponse.redirect(url);
     }
 
-    // Redirect logged-in users away from auth pages
+    // Role-based access control
+    if (user) {
+        const role = user.user_metadata?.role;
+
+        // Candidate trying to access recruiter dashboard
+        if (isRecruiterPath && role === 'candidate') {
+            const url = request.nextUrl.clone();
+            url.pathname = '/candidate';
+            return NextResponse.redirect(url);
+        }
+
+        // Recruiter trying to access candidate dashboard
+        if (isCandidatePath && role === 'recruiter') {
+            const url = request.nextUrl.clone();
+            url.pathname = '/dashboard';
+            return NextResponse.redirect(url);
+        }
+    }
+
+    // Redirect logged-in users from auth pages based on role
     const authPaths = ['/login', '/signup'];
-    const isAuthPath = authPaths.some(path =>
-        request.nextUrl.pathname === path
-    );
+    const isAuthPath = authPaths.some(path => pathname === path);
 
     if (isAuthPath && user) {
         const url = request.nextUrl.clone();
-        url.pathname = '/dashboard';
+        const role = user.user_metadata?.role;
+        url.pathname = role === 'candidate' ? '/candidate' : '/dashboard';
         return NextResponse.redirect(url);
     }
 
     return supabaseResponse;
 }
+

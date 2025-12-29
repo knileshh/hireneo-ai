@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -78,14 +79,18 @@ export default function SignupPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#FAFAF9] px-4 py-8">
-            <Card className="w-full max-w-md p-8">
-                <div className="text-center mb-8">
-                    <div className="w-12 h-12 bg-[#1A3305] rounded-xl mx-auto mb-4 flex items-center justify-center">
-                        <span className="text-2xl">🧠</span>
-                    </div>
-                    <h1 className="text-2xl font-bold text-gray-900">Create your account</h1>
-                    <p className="text-muted-foreground mt-1">
+        <div className="min-h-screen flex items-center justify-center bg-[#FAFAF9] px-4 py-6">
+            <Card className="w-full max-w-md p-6">
+                <div className="text-center mb-6">
+                    <Image
+                        src="/logo.png"
+                        alt="HireNeo AI"
+                        width={48}
+                        height={48}
+                        className="mx-auto mb-3 rounded-xl"
+                    />
+                    <h1 className="text-xl font-bold text-gray-900">Create your account</h1>
+                    <p className="text-sm text-muted-foreground mt-1">
                         Join HireNeo AI to streamline your hiring
                     </p>
                 </div>
@@ -98,34 +103,34 @@ export default function SignupPage() {
                 )}
 
                 {/* Role Selection */}
-                <div className="grid grid-cols-2 gap-3 mb-6">
+                <div className="grid grid-cols-2 gap-2 mb-4">
                     <button
                         type="button"
                         onClick={() => setRole('candidate')}
-                        className={`p-4 rounded-lg border-2 text-left transition-all ${role === 'candidate'
-                                ? 'border-[#1A3305] bg-[#1A3305]/5'
-                                : 'border-gray-200 hover:border-gray-300'
+                        className={`p-3 rounded-lg border-2 text-left transition-all ${role === 'candidate'
+                            ? 'border-[#1A3305] bg-[#1A3305]/5'
+                            : 'border-gray-200 hover:border-gray-300'
                             }`}
                     >
-                        <User className="w-5 h-5 mb-2" />
-                        <p className="font-medium">Candidate</p>
+                        <User className="w-4 h-4 mb-1" />
+                        <p className="text-sm font-medium">Candidate</p>
                         <p className="text-xs text-muted-foreground">Find your dream job</p>
                     </button>
                     <button
                         type="button"
                         onClick={() => setRole('recruiter')}
-                        className={`p-4 rounded-lg border-2 text-left transition-all ${role === 'recruiter'
-                                ? 'border-[#1A3305] bg-[#1A3305]/5'
-                                : 'border-gray-200 hover:border-gray-300'
+                        className={`p-3 rounded-lg border-2 text-left transition-all ${role === 'recruiter'
+                            ? 'border-[#1A3305] bg-[#1A3305]/5'
+                            : 'border-gray-200 hover:border-gray-300'
                             }`}
                     >
-                        <Building2 className="w-5 h-5 mb-2" />
-                        <p className="font-medium">Recruiter</p>
+                        <Building2 className="w-4 h-4 mb-1" />
+                        <p className="text-sm font-medium">Recruiter</p>
                         <p className="text-xs text-muted-foreground">Hire top talent</p>
                     </button>
                 </div>
 
-                <form onSubmit={handleSignup} className="space-y-4">
+                <form onSubmit={handleSignup} className="space-y-3">
                     <div>
                         <label className="text-sm font-medium">Full Name</label>
                         <div className="relative mt-1">
@@ -203,7 +208,7 @@ export default function SignupPage() {
                     </Button>
                 </form>
 
-                <p className="text-center text-sm text-muted-foreground mt-6">
+                <p className="text-center text-sm text-muted-foreground mt-4">
                     Already have an account?{' '}
                     <Link href="/login" className="text-[#1A3305] font-medium hover:underline">
                         Sign in

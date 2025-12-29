@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,9 +57,13 @@ export default function LoginPage() {
         <div className="min-h-screen flex items-center justify-center bg-[#FAFAF9] px-4">
             <Card className="w-full max-w-md p-8">
                 <div className="text-center mb-8">
-                    <div className="w-12 h-12 bg-[#1A3305] rounded-xl mx-auto mb-4 flex items-center justify-center">
-                        <span className="text-2xl">🧠</span>
-                    </div>
+                    <Image
+                        src="/logo.png"
+                        alt="HireNeo AI"
+                        width={48}
+                        height={48}
+                        className="mx-auto mb-4 rounded-xl"
+                    />
                     <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
                     <p className="text-muted-foreground mt-1">
                         Sign in to your HireNeo AI account
