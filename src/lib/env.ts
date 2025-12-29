@@ -21,6 +21,9 @@ const envSchema = z.object({
 
     // Polar.sh
     POLAR_ACCESS_TOKEN: z.string().optional(),
+    POLAR_WEBHOOK_SECRET: z.string().optional(),
+    POLAR_PRO_PRODUCT_ID: z.string().optional(),
+    POLAR_ENTERPRISE_PRODUCT_ID: z.string().optional(),
 
     // App Config
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
