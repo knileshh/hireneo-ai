@@ -26,7 +26,11 @@ export async function POST(request: NextRequest) {
         const tierConfig = PRICING_TIERS[tier as 'pro' | 'enterprise'];
         const productId = tierConfig.productId;
 
+        console.log('Creating checkout for:', { tier, productId, email: user.email });
+
         if (!productId) {
+            console.error('Product ID not configured for tier:', tier);
+            console.error('Env POLAR_PRO_PRODUCT_ID:', process.env.POLAR_PRO_PRODUCT_ID);
             return NextResponse.json(
                 { error: 'Product not configured' },
                 { status: 500 }
@@ -45,14 +49,22 @@ export async function POST(request: NextRequest) {
             },
         });
 
+        console.log('Checkout created:', checkout);
+
         return NextResponse.json({
             checkoutUrl: checkout.url,
         });
-    } catch (error) {
-        console.error('Checkout error:', error);
+    } catch (error: any) {
+        console.error('Checkout error details:', {
+            message: error?.message,
+            status: error?.status,
+            body: error?.body,
+            stack: error?.stack,
+        });
         return NextResponse.json(
-            { error: 'Failed to create checkout session' },
+            { error: 'Failed to create checkout session', details: error?.message },
             { status: 500 }
         );
     }
 }
+

@@ -71,11 +71,14 @@ export async function createCheckoutSession({
     successUrl: string;
     metadata?: Record<string, string>;
 }) {
-    const checkout = await polar.checkouts.custom.create({
-        productId,
+    console.log('Calling Polar checkouts.create with:', { productId, customerEmail, successUrl });
+
+    // Use the checkouts.create method with products array
+    const checkout = await polar.checkouts.create({
+        products: [productId],
         successUrl,
         customerEmail,
-        metadata,
+        customerMetadata: metadata,
     });
 
     return checkout;
