@@ -69,12 +69,12 @@ export function Hero() {
 
                 {/* Buttons */}
                 <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
-                    <Link href="/sign-up">
+                    <Link href="/signup">
                         <Button size="lg" className="h-14 px-8 rounded-2xl bg-[#1A3305] text-[#F3F4F6] text-lg font-bold hover:bg-[#1A3305]/90 hover:scale-105 transition-all shadow-xl shadow-[#1A3305]/20">
                             Practice For Free Try Now!
                         </Button>
                     </Link>
-                    <Link href="/demo">
+                    <Link href="/jobs">
                         <Button size="lg" variant="outline" className="h-14 px-8 rounded-2xl bg-white border-black/10 text-lg font-bold hover:bg-gray-50 hover:scale-105 transition-all">
                             Hire Top Talent
                         </Button>

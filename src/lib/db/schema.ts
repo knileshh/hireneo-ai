@@ -128,6 +128,7 @@ export const candidates = pgTable('candidates', {
     name: text('name').notNull(),
     email: text('email').notNull(),
     phone: text('phone'),
+    userId: text('user_id'), // Supabase auth user ID
     resumeUrl: text('resume_url'), // Path to uploaded file
     // AI-parsed resume data
     parsedResume: jsonb('parsed_resume').$type<{
@@ -151,6 +152,26 @@ export const candidates = pgTable('candidates', {
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull()
 });
+
+// Candidate Profiles - User's default resume and profile info
+export const candidateProfiles = pgTable('candidate_profiles', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: text('user_id').notNull().unique(), // Supabase auth user ID
+    name: text('name').notNull(),
+    email: text('email').notNull(),
+    phone: text('phone'),
+    resumeUrl: text('resume_url'), // Default resume file URL
+    parsedResume: jsonb('parsed_resume').$type<{
+        summary: string;
+        skills: string[];
+        experience: { company: string; role: string; duration: string; description: string }[];
+        education: { institution: string; degree: string; year: string }[];
+        certifications: string[];
+    }>(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull()
+});
+
 
 // ============ RELATIONS ============
 

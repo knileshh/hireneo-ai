@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { Brain, CheckCircle2, ChevronRight, Clock, Star, Users, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -80,9 +81,11 @@ export function FeaturesBento() {
                             </div>
                             <h3 className="font-heading font-bold text-3xl mb-4 text-[#064E3B]">AI Question Generator</h3>
                             <p className="text-[#065F46] text-lg mb-8">Stop Googling "good interview questions." Our AI analyzes the job role and generates perfect technical & behavioral questions instantly.</p>
-                            <Button variant="outline" className="rounded-full bg-white border-[#059669]/20 text-[#065F46] hover:bg-[#D1FAE5] font-bold">
-                                Try Generator <ChevronRight className="w-4 h-4 ml-1" />
-                            </Button>
+                            <Link href="/dashboard">
+                                <Button variant="outline" className="rounded-full bg-white border-[#059669]/20 text-[#065F46] hover:bg-[#D1FAE5] font-bold">
+                                    Try Generator <ChevronRight className="w-4 h-4 ml-1" />
+                                </Button>
+                            </Link>
                         </div>
 
                         {/* Abstract UI representation */}
