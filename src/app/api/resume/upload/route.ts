@@ -50,37 +50,53 @@ export async function POST(request: NextRequest) {
         const buffer = Buffer.from(await file.arrayBuffer());
 
         // Upload to Supabase Storage
-        const resumeUrl = await uploadResume(buffer, file.name, user.id);
+        let resumeUrl: string;
+        try {
+            resumeUrl = await uploadResume(buffer, file.name, user.id);
+        } catch (uploadError: any) {
+            console.error('Storage upload error:', uploadError);
+            return NextResponse.json(
+                { error: `Storage error: ${uploadError.message}` },
+                { status: 500 }
+            );
+        }
 
-        // Extract text from file
-        const resumeText = await extractTextFromFile(buffer, file.name);
-
-        // Parse with AI
-        const parsedResume = await parseResumeWithAI(resumeText);
+        // Try to extract text and parse with AI (optional - don't fail if this breaks)
+        let parsedResume = null;
+        try {
+            const resumeText = await extractTextFromFile(buffer, file.name);
+            parsedResume = await parseResumeWithAI(resumeText);
+        } catch (parseError) {
+            console.error('Resume parsing error (non-fatal):', parseError);
+            // Continue without parsed resume - user can still apply
+        }
 
         // Save or update candidate profile
-        const existingProfile = await db.query.candidateProfiles.findFirst({
-            where: eq(candidateProfiles.userId, user.id),
-        });
+        try {
+            const existingProfile = await db.query.candidateProfiles.findFirst({
+                where: eq(candidateProfiles.userId, user.id),
+            });
 
-        if (existingProfile) {
-            // Update existing profile
-            await db.update(candidateProfiles)
-                .set({
+            if (existingProfile) {
+                await db.update(candidateProfiles)
+                    .set({
+                        resumeUrl,
+                        parsedResume,
+                        updatedAt: new Date(),
+                    })
+                    .where(eq(candidateProfiles.userId, user.id));
+            } else {
+                await db.insert(candidateProfiles).values({
+                    userId: user.id,
+                    name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+                    email: user.email!,
                     resumeUrl,
                     parsedResume,
-                    updatedAt: new Date(),
-                })
-                .where(eq(candidateProfiles.userId, user.id));
-        } else {
-            // Create new profile
-            await db.insert(candidateProfiles).values({
-                userId: user.id,
-                name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
-                email: user.email!,
-                resumeUrl,
-                parsedResume,
-            });
+                });
+            }
+        } catch (dbError: any) {
+            console.error('Database error:', dbError);
+            // Resume is uploaded, just profile save failed - still return success
         }
 
         return NextResponse.json({

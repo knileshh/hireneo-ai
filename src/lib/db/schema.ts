@@ -236,6 +236,9 @@ export const candidatesRelations = relations(candidates, ({ one }) => ({
     })
 }));
 
+// candidateProfiles has no foreign key relations, just standalone table
+export const candidateProfilesRelations = relations(candidateProfiles, () => ({}));
+
 // ============ TYPE EXPORTS ============
 
 export type Job = typeof jobs.$inferSelect;
@@ -254,3 +257,6 @@ export type Evaluation = typeof evaluations.$inferSelect;
 export type NewEvaluation = typeof evaluations.$inferInsert;
 export type Candidate = typeof candidates.$inferSelect;
 export type NewCandidate = typeof candidates.$inferInsert;
+export type CandidateProfile = typeof candidateProfiles.$inferSelect;
+export type NewCandidateProfile = typeof candidateProfiles.$inferInsert;
+
