@@ -113,6 +113,134 @@ export const resendClient = {
   },
 
   /**
+   * Send welcome email to new user
+   */
+  async sendWelcomeEmail(params: {
+    to: string;
+    userName: string;
+    userRole: 'candidate' | 'recruiter';
+  }) {
+    const { to, userName, userRole } = params;
+
+    logger.info({
+      to,
+      userName,
+      userRole,
+    }, 'Sending welcome email');
+
+    try {
+      const fromAddress = 'HireNeo AI <noreply@mail.knileshh.com>';
+
+      const result = await resend.emails.send({
+        from: fromAddress,
+        to: [to],
+        subject: 'Welcome to HireNeo AI - Let\'s Transform Your Hiring! 🚀',
+        html: generateWelcomeEmailHtml({
+          userName,
+          userRole,
+        }),
+      });
+
+      if (result.error) {
+        throw new ResendError(
+          result.error.message,
+          undefined,
+          result.error
+        );
+      }
+
+      logger.info({
+        emailId: result.data?.id,
+        to,
+      }, 'Welcome email sent successfully');
+
+      return result;
+
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logger.error({
+        to,
+        userName,
+        error: errorMessage,
+      }, 'Failed to send welcome email');
+
+      if (error instanceof ResendError) {
+        throw error;
+      }
+
+      throw new ResendError(
+        `Failed to send welcome email: ${errorMessage}`,
+        500,
+        error
+      );
+    }
+  },
+
+  /**
+   * Send welcome email to new user
+   */
+  async sendWelcomeEmail(params: {
+    to: string;
+    userName: string;
+    userRole: 'candidate' | 'recruiter';
+  }) {
+    const { to, userName, userRole } = params;
+
+    logger.info({
+      to,
+      userName,
+      userRole,
+    }, 'Sending welcome email');
+
+    try {
+      const fromAddress = 'HireNeo AI <noreply@mail.knileshh.com>';
+
+      const result = await resend.emails.send({
+        from: fromAddress,
+        to: [to],
+        subject: 'Welcome to HireNeo AI - Let\'s Transform Your Hiring! 🚀',
+        html: generateWelcomeEmailHtml({
+          userName,
+          userRole,
+        }),
+      });
+
+      if (result.error) {
+        throw new ResendError(
+          result.error.message,
+          undefined,
+          result.error
+        );
+      }
+
+      logger.info({
+        emailId: result.data?.id,
+        to,
+      }, 'Welcome email sent successfully');
+
+      return result;
+
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logger.error({
+        to,
+        userName,
+        error: errorMessage,
+      }, 'Failed to send welcome email');
+
+      if (error instanceof ResendError) {
+        throw error;
+      }
+
+      throw new ResendError(
+        `Failed to send welcome email: ${errorMessage}`,
+        500,
+        error
+      );
+    }
+  },
+
+  /**
    * Send assessment invite email to shortlisted candidate
    */
   async sendAssessmentInvite(params: {
@@ -320,6 +448,110 @@ function generateAssessmentInviteHtml(params: {
             Good luck! 🍀<br/>
             Sent by <strong style="color: #1A3305;">HireNeo AI</strong>
           </p>
+        </div>
+      </body>
+    </html>
+  `;
+}
+
+/**
+ * Generate HTML template for welcome email
+ */
+function generateWelcomeEmailHtml(params: {
+  userName: string;
+  userRole: 'candidate' | 'recruiter';
+}): string {
+  const { userName, userRole } = params;
+
+  const roleContent = userRole === 'recruiter' 
+    ? {
+        title: 'Welcome to HireNeo AI',
+        subtitle: 'Transform your hiring process with AI-powered interviews',
+        features: [
+          '🎯 AI-Generated Interview Questions tailored to each role',
+          '🎤 Automated Candidate Assessments with voice/text responses',
+          '📊 Intelligent Scoring & Analytics to identify top talent',
+          '⚡ Streamlined Workflow from job posting to final evaluation',
+          '🔔 Smart Reminders & Notifications for you and candidates',
+        ],
+        cta: 'Create Your First Job',
+        ctaUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/dashboard/jobs`,
+      }
+    : {
+        title: 'Welcome to HireNeo AI',
+        subtitle: 'Get ready for a smarter interview experience',
+        features: [
+          '🎯 Personalized interview questions matched to your skills',
+          '🎤 Flexible response options - type or record your answers',
+          '📊 Instant feedback and detailed performance insights',
+          '⚡ Quick 20-30 minute assessments that fit your schedule',
+          '🔔 Timely notifications to keep you in the loop',
+        ],
+        cta: 'View Opportunities',
+        ctaUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/jobs`,
+      };
+
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${roleContent.title}</title>
+      </head>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #FAFAF9;">
+        <div style="background: linear-gradient(135deg, #1A3305 0%, #2D5A0A 100%); padding: 40px 30px; border-radius: 12px 12px 0 0; text-align: center;">
+          <div style="width: 64px; height: 64px; background: white; border-radius: 16px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 32px;">🚀</div>
+          <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">${roleContent.title}</h1>
+          <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 16px;">${roleContent.subtitle}</p>
+        </div>
+        
+        <div style="background: white; padding: 40px 30px; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0; border-top: none;">
+          <p style="font-size: 16px; color: #334155; margin-top: 0;">Hi ${userName},</p>
+          <p style="font-size: 16px; color: #334155;">Welcome to <strong style="color: #1A3305;">HireNeo AI</strong>! 🎉 We're excited to have you on board.</p>
+          
+          <p style="font-size: 16px; color: #334155; margin-bottom: 24px;">
+            ${userRole === 'recruiter' 
+              ? 'You\'re all set to revolutionize your hiring process. Here\'s what you can do with HireNeo AI:'
+              : 'You\'re all set to showcase your skills through our intelligent interview platform. Here\'s what makes HireNeo AI special:'}
+          </p>
+
+          <div style="background: #ECFDF5; padding: 24px; border-radius: 12px; margin: 24px 0; border: 1px solid rgba(26, 51, 5, 0.1);">
+            ${roleContent.features.map(feature => `
+              <div style="margin-bottom: 12px; color: #0f172a; font-size: 15px; line-height: 1.6;">${feature}</div>
+            `).join('')}
+          </div>
+
+          <div style="text-align: center; margin: 32px 0;">
+            <a href="${roleContent.ctaUrl}" style="display: inline-block; background: #1A3305; color: white; padding: 16px 32px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(26, 51, 5, 0.2);">
+              ${roleContent.cta} →
+            </a>
+          </div>
+
+          ${userRole === 'recruiter' ? `
+          <div style="background: #FEF3C7; padding: 20px; border-radius: 10px; margin: 24px 0; border: 1px solid #F59E0B;">
+            <p style="margin: 0; color: #B45309; font-size: 14px; line-height: 1.6;">
+              💡 <strong>Pro Tip:</strong> Start by creating a job posting, and let our AI generate customized interview questions. Your candidates will receive assessment links automatically!
+            </p>
+          </div>
+          ` : `
+          <div style="background: #EFF6FF; padding: 20px; border-radius: 10px; margin: 24px 0; border: 1px solid #3B82F6;">
+            <p style="margin: 0; color: #1E40AF; font-size: 14px; line-height: 1.6;">
+              💡 <strong>Pro Tip:</strong> When you receive an assessment invitation, find a quiet space and take your time to provide thoughtful answers. You've got this!
+            </p>
+          </div>
+          `}
+
+          <p style="font-size: 14px; color: #64748b; margin-top: 32px;">
+            Need help getting started? Check out our <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/docs" style="color: #1A3305; text-decoration: underline;">documentation</a> or reply to this email.
+          </p>
+          
+          <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
+            <p style="font-size: 14px; color: #94a3b8; margin: 0;">
+              Happy ${userRole === 'recruiter' ? 'hiring' : 'interviewing'}! 🌟<br/>
+              The <strong style="color: #1A3305;">HireNeo AI</strong> Team
+            </p>
+          </div>
         </div>
       </body>
     </html>
