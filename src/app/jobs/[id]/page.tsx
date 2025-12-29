@@ -67,7 +67,9 @@ export default function JobDetailPage() {
 
     const applyMutation = useMutation({
         mutationFn: async () => {
-            const res = null;
+            setIsUploading(true);
+            setUploadProgress(10);
+            let resumeUrl = null;
 
             if (uploadMethod === 'file' && selectedFile) {
                 // Upload file to Supabase
@@ -107,6 +109,8 @@ export default function JobDetailPage() {
             });
 
             setUploadProgress(100);
+            setIsUploading(false);
+
             if (!res.ok) {
                 const err = await res.json();
                 throw new Error(err.error || 'Failed to apply');
@@ -115,6 +119,8 @@ export default function JobDetailPage() {
         },
         onSuccess: () => {
             setApplied(true);
+            setUploadProgress(0);
+            setSelectedFile(null);
         },
     });
 
