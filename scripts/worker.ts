@@ -11,6 +11,7 @@
 import 'dotenv/config';
 
 import '../src/lib/queue/workers/email.worker';
+import '../src/lib/queue/workers/welcome-email.worker';
 import '../src/lib/queue/workers/evaluation.worker';
 import '../src/lib/queue/workers/reminder.worker';
 
@@ -18,9 +19,24 @@ import '../src/lib/queue/workers/reminder.worker';
 import { env } from '../src/lib/env';
 import { logger } from '../src/lib/logger';
 
+// Determine which Redis connection is being used
+const isUpstash = !!(env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN);
+const redisConnection = isUpstash 
+    ? {
+        type: 'upstash',
+        host: new URL(env.UPSTASH_REDIS_REST_URL).hostname,
+        port: 6379,
+    }
+    : {
+        type: 'local',
+        host: env.REDIS_HOST,
+        port: env.REDIS_PORT,
+    };
+
 logger.info({
-    redisHost: env.REDIS_HOST,
-    redisPort: env.REDIS_PORT,
+    redisType: redisConnection.type,
+    redisHost: redisConnection.host,
+    redisPort: redisConnection.port,
     nodeEnv: env.NODE_ENV,
 }, 'Starting all workers');
 
