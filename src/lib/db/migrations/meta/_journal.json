@@ -15,6 +15,13 @@
       "when": 1766955735418,
       "tag": "0001_lively_mach_iv",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766999213525,
+      "tag": "0002_deep_ken_ellis",
+      "breakpoints": true
     }
   ]
 }

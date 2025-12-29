@@ -94,6 +94,27 @@ async function main() {
         `);
         console.log('✓ Added recommendation to evaluations');
 
+        // Create candidates table if not exists
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS "candidates" (
+                "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+                "job_id" uuid NOT NULL REFERENCES "jobs"("id"),
+                "name" text NOT NULL,
+                "email" text NOT NULL,
+                "phone" text,
+                "resume_url" text,
+                "parsed_resume" jsonb,
+                "match_score" integer,
+                "match_analysis" jsonb,
+                "status" text DEFAULT 'NEW' NOT NULL,
+                "interview_id" uuid REFERENCES "interviews"("id"),
+                "invited_at" timestamp,
+                "created_at" timestamp DEFAULT now() NOT NULL,
+                "updated_at" timestamp DEFAULT now() NOT NULL
+            );
+        `);
+        console.log('✓ Created candidates table');
+
         console.log('\\n✅ All schema updates applied successfully!');
 
     } finally {

@@ -121,10 +121,42 @@ export const evaluations = pgTable('evaluations', {
     createdAt: timestamp('created_at').defaultNow().notNull()
 });
 
+// Candidates table - Applicants with parsed resume data and AI scoring
+export const candidates = pgTable('candidates', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    jobId: uuid('job_id').references(() => jobs.id).notNull(),
+    name: text('name').notNull(),
+    email: text('email').notNull(),
+    phone: text('phone'),
+    resumeUrl: text('resume_url'), // Path to uploaded file
+    // AI-parsed resume data
+    parsedResume: jsonb('parsed_resume').$type<{
+        summary: string;
+        skills: string[];
+        experience: { company: string; role: string; duration: string; description: string }[];
+        education: { institution: string; degree: string; year: string }[];
+        certifications: string[];
+    }>(),
+    // AI Job Match Scoring
+    matchScore: integer('match_score'), // 0-100
+    matchAnalysis: jsonb('match_analysis').$type<{
+        strengths: string[];
+        gaps: string[];
+        recommendation: string;
+    }>(),
+    // Status tracking
+    status: text('status').default('NEW').notNull(), // NEW, SHORTLISTED, INVITED, COMPLETED, REJECTED
+    interviewId: uuid('interview_id').references(() => interviews.id), // Link to interview when invited
+    invitedAt: timestamp('invited_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull()
+});
+
 // ============ RELATIONS ============
 
 export const jobsRelations = relations(jobs, ({ many }) => ({
-    interviews: many(interviews)
+    interviews: many(interviews),
+    candidates: many(candidates)
 }));
 
 export const interviewsRelations = relations(interviews, ({ one, many }) => ({
@@ -172,6 +204,17 @@ export const candidateResponsesRelations = relations(candidateResponses, ({ one 
     })
 }));
 
+export const candidatesRelations = relations(candidates, ({ one }) => ({
+    job: one(jobs, {
+        fields: [candidates.jobId],
+        references: [jobs.id]
+    }),
+    interview: one(interviews, {
+        fields: [candidates.interviewId],
+        references: [interviews.id]
+    })
+}));
+
 // ============ TYPE EXPORTS ============
 
 export type Job = typeof jobs.$inferSelect;
@@ -188,3 +231,5 @@ export type Scorecard = typeof scorecards.$inferSelect;
 export type NewScorecard = typeof scorecards.$inferInsert;
 export type Evaluation = typeof evaluations.$inferSelect;
 export type NewEvaluation = typeof evaluations.$inferInsert;
+export type Candidate = typeof candidates.$inferSelect;
+export type NewCandidate = typeof candidates.$inferInsert;

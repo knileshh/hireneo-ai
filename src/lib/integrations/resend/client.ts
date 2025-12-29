@@ -111,6 +111,74 @@ export const resendClient = {
       );
     }
   },
+
+  /**
+   * Send assessment invite email to shortlisted candidate
+   */
+  async sendAssessmentInvite(params: {
+    to: string;
+    candidateName: string;
+    jobTitle: string;
+    assessmentUrl: string;
+    expiresAt: Date;
+  }) {
+    const { to, candidateName, jobTitle, assessmentUrl, expiresAt } = params;
+
+    logger.info({
+      to,
+      candidateName,
+      jobTitle,
+    }, 'Sending assessment invite email');
+
+    try {
+      const fromAddress = 'HireNeo AI <noreply@mail.knileshh.com>';
+
+      const result = await resend.emails.send({
+        from: fromAddress,
+        to: [to],
+        subject: `Complete Your Assessment for ${jobTitle} - HireNeo AI`,
+        html: generateAssessmentInviteHtml({
+          candidateName,
+          jobTitle,
+          assessmentUrl,
+          expiresAt,
+        }),
+      });
+
+      if (result.error) {
+        throw new ResendError(
+          result.error.message,
+          undefined,
+          result.error
+        );
+      }
+
+      logger.info({
+        emailId: result.data?.id,
+        to,
+      }, 'Assessment invite email sent successfully');
+
+      return result;
+
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logger.error({
+        to,
+        candidateName,
+        error: errorMessage,
+      }, 'Failed to send assessment invite email');
+
+      if (error instanceof ResendError) {
+        throw error;
+      }
+
+      throw new ResendError(
+        `Failed to send assessment invite: ${errorMessage}`,
+        500,
+        error
+      );
+    }
+  },
 };
 
 /**
@@ -172,6 +240,84 @@ function generateInterviewEmailHtml(params: {
           </p>
           
           <p style="font-size: 14px; color: #94a3b8; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+            Sent by <strong style="color: #1A3305;">HireNeo AI</strong>
+          </p>
+        </div>
+      </body>
+    </html>
+  `;
+}
+
+/**
+ * Generate HTML template for assessment invite email
+ */
+function generateAssessmentInviteHtml(params: {
+  candidateName: string;
+  jobTitle: string;
+  assessmentUrl: string;
+  expiresAt: Date;
+}): string {
+  const { candidateName, jobTitle, assessmentUrl, expiresAt } = params;
+
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Complete Your Assessment</title>
+      </head>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #FAFAF9;">
+        <div style="background: #1A3305; padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+          <h1 style="color: white; margin: 0; font-size: 24px;">You're Shortlisted! 🎉</h1>
+        </div>
+        <div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0; border-top: none;">
+          <p style="font-size: 16px; color: #334155; margin-top: 0;">Hello ${candidateName},</p>
+          <p style="font-size: 16px; color: #334155;">
+            Great news! You've been shortlisted for the <strong>${jobTitle}</strong> position.
+          </p>
+          <p style="font-size: 16px; color: #334155;">
+            Please complete your assessment to continue in the hiring process.
+          </p>
+          
+          <div style="background: #ECFDF5; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid rgba(26, 51, 5, 0.2);">
+            <p style="margin: 0 0 10px 0; color: #1A3305; font-size: 14px; font-weight: 600;">📋 Assessment Details</p>
+            <ul style="margin: 0; padding-left: 20px; color: #0f172a; font-size: 14px;">
+              <li>8 questions covering personal, behavioral, and technical topics</li>
+              <li>Each question has a time limit (2-4 minutes)</li>
+              <li>You can type or record your answers</li>
+              <li>Takes approximately 20-30 minutes</li>
+            </ul>
+          </div>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${assessmentUrl}" style="display: inline-block; background: #1A3305; color: white; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
+              Start Assessment →
+            </a>
+          </div>
+          
+          <div style="background: #FEF3C7; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #F59E0B;">
+            <p style="margin: 0; color: #B45309; font-size: 14px;">
+              ⏰ <strong>Expires:</strong> ${expiresAt.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })}
+            </p>
+          </div>
+
+          <p style="font-size: 14px; color: #64748b; margin-top: 30px;">
+            Tips for a great assessment:
+          </p>
+          <ul style="font-size: 14px; color: #64748b; padding-left: 20px;">
+            <li>Find a quiet space with a stable internet connection</li>
+            <li>Have your resume nearby for reference</li>
+            <li>Take your time to provide thoughtful answers</li>
+          </ul>
+          
+          <p style="font-size: 14px; color: #94a3b8; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+            Good luck! 🍀<br/>
             Sent by <strong style="color: #1A3305;">HireNeo AI</strong>
           </p>
         </div>
