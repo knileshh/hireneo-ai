@@ -334,7 +334,7 @@ function generateInterviewEmailHtml(params: {
       </head>
       <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #FAFAF9;">
         <div style="background: #1A3305; padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
-          <img src="https://hireneo.ai/logo.png" alt="HireNeo AI" width="48" height="48" style="border-radius: 8px; margin-bottom: 12px;" />
+          <img src="https://hireneo-ai.xyz/logo.png" alt="HireNeo AI" width="48" height="48" style="border-radius: 8px; margin-bottom: 12px;" />
           <h1 style="color: white; margin: 0; font-size: 24px;">Interview Scheduled</h1>
         </div>
         <div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0; border-top: none;">
@@ -479,7 +479,7 @@ function generateWelcomeEmailHtml(params: {
         '🔔 Smart Reminders & Notifications for you and candidates',
       ],
       cta: 'Create Your First Job',
-      ctaUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/dashboard/jobs`,
+      ctaUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://hireneo-ai.xyz'}/dashboard/jobs`,
     }
     : {
       title: 'Welcome to HireNeo AI',
@@ -492,7 +492,7 @@ function generateWelcomeEmailHtml(params: {
         '🔔 Timely notifications to keep you in the loop',
       ],
       cta: 'View Opportunities',
-      ctaUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/jobs`,
+      ctaUrl: `${process.env.NEXT_PUBLIC_BASE_URL || 'https://hireneo-ai.xyz'}/jobs`,
     };
 
   return `
@@ -547,7 +547,7 @@ function generateWelcomeEmailHtml(params: {
           `}
 
           <p style="font-size: 14px; color: #64748b; margin-top: 32px;">
-            Need help getting started? Check out our <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/docs" style="color: #1A3305; text-decoration: underline;">documentation</a> or reply to this email.
+            Need help getting started? Check out our <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'https://hireneo-ai.xyz'}/docs" style="color: #1A3305; text-decoration: underline;">documentation</a> or reply to this email.
           </p>
           
           <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
