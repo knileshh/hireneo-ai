@@ -132,11 +132,15 @@ export const candidates = pgTable('candidates', {
     resumeUrl: text('resume_url'), // Path to uploaded file
     // AI-parsed resume data
     parsedResume: jsonb('parsed_resume').$type<{
+        name: string;
+        email: string;
+        phone?: string;
         summary: string;
         skills: string[];
         experience: { company: string; role: string; duration: string; description: string }[];
         education: { institution: string; degree: string; year: string }[];
-        certifications: string[];
+        certifications?: string[];
+        yearsOfExperience: number;
     }>(),
     // AI Job Match Scoring
     matchScore: integer('match_score'), // 0-100
@@ -162,11 +166,15 @@ export const candidateProfiles = pgTable('candidate_profiles', {
     phone: text('phone'),
     resumeUrl: text('resume_url'), // Default resume file URL
     parsedResume: jsonb('parsed_resume').$type<{
+        name: string;
+        email: string;
+        phone?: string;
         summary: string;
         skills: string[];
         experience: { company: string; role: string; duration: string; description: string }[];
         education: { institution: string; degree: string; year: string }[];
-        certifications: string[];
+        certifications?: string[];
+        yearsOfExperience: number;
     }>(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull()
