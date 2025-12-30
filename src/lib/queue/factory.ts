@@ -39,7 +39,7 @@ export interface ReminderJobData {
 }
 
 // Email queue for interview confirmations
-export const emailQueue = new Queue<EmailJobData>('email', {
+export const emailQueue = (process.env.SKIP_ENV_VALIDATION ? {} : new Queue<EmailJobData>('email', {
     connection,
     defaultJobOptions: {
         attempts: 3,
@@ -50,10 +50,10 @@ export const emailQueue = new Queue<EmailJobData>('email', {
         removeOnComplete: 100,
         removeOnFail: 1000,
     },
-});
+})) as Queue<EmailJobData>;
 
 // Welcome email queue for new user signups
-export const welcomeEmailQueue = new Queue<WelcomeEmailJobData>('welcome-email', {
+export const welcomeEmailQueue = (process.env.SKIP_ENV_VALIDATION ? {} : new Queue<WelcomeEmailJobData>('welcome-email', {
     connection,
     defaultJobOptions: {
         attempts: 3,
@@ -64,10 +64,10 @@ export const welcomeEmailQueue = new Queue<WelcomeEmailJobData>('welcome-email',
         removeOnComplete: 100,
         removeOnFail: 1000,
     },
-});
+})) as Queue<WelcomeEmailJobData>;
 
 // Evaluation queue for AI processing
-export const evaluationQueue = new Queue<EvaluationJobData>('evaluation', {
+export const evaluationQueue = (process.env.SKIP_ENV_VALIDATION ? {} : new Queue<EvaluationJobData>('evaluation', {
     connection,
     defaultJobOptions: {
         attempts: 3,
@@ -78,10 +78,10 @@ export const evaluationQueue = new Queue<EvaluationJobData>('evaluation', {
         removeOnComplete: 50,
         removeOnFail: 500,
     },
-});
+})) as Queue<EvaluationJobData>;
 
 // Reminder queue for scheduled reminders
-export const reminderQueue = new Queue<ReminderJobData>('reminder', {
+export const reminderQueue = (process.env.SKIP_ENV_VALIDATION ? {} : new Queue<ReminderJobData>('reminder', {
     connection,
     defaultJobOptions: {
         attempts: 3,
@@ -92,7 +92,7 @@ export const reminderQueue = new Queue<ReminderJobData>('reminder', {
         removeOnComplete: 100,
         removeOnFail: 500,
     },
-});
+})) as Queue<ReminderJobData>;
 
 /**
  * Schedule reminder jobs for an interview

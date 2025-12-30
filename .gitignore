@@ -45,4 +45,7 @@ next-env.d.ts
 /.clerk/
 
 # deployment docs
+
+DEPLOYMENT.md
+
 DEPLOYMENT.md
