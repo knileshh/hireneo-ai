@@ -5,9 +5,7 @@ const nextConfig: NextConfig = {
   output: 'standalone',
 
   // External packages for serverless compatibility
-  experimental: {
-    serverComponentsExternalPackages: ['bullmq', 'ioredis'],
-  },
+  serverExternalPackages: ['bullmq', 'ioredis'],
 
   images: {
     remotePatterns: [
