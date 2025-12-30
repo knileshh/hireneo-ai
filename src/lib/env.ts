@@ -42,6 +42,9 @@ export const env = skipValidation
         // Provide defaults that are critical for build/runtime init even when skipping validation
         LOG_LEVEL: process.env.LOG_LEVEL || 'info',
         NODE_ENV: process.env.NODE_ENV || 'development',
+        // Mock keys to satisfy synchronous constructors (like new Resend())
+        OPENAI_API_KEY: process.env.OPENAI_API_KEY || 'mock_openai_key',
+        RESEND_API_KEY: process.env.RESEND_API_KEY || 're_mock_resend_key',
     } as unknown as z.infer<typeof envSchema>
     : envSchema.parse(process.env);
 
