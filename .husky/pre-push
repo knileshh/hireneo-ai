@@ -1,0 +1,7 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo ""
+echo "🏗️  [Husky] Running pre-push build check..."
+echo ""
+npm run build
