@@ -48,3 +48,34 @@ process.on('unhandledRejection', (reason) => {
     logger.error({ reason }, 'Unhandled rejection in worker process');
     process.exit(1);
 });
+
+// Setup lightweight HTTP server for Cloud Run health checks
+import http from 'http';
+
+const port = process.env.PORT || 8080;
+
+const server = http.createServer((req, res) => {
+    if (req.url === '/health' || req.url === '/') {
+        res.writeHead(200);
+        res.end('Worker is running');
+    } else {
+        res.writeHead(404);
+        res.end('Not found');
+    }
+});
+
+server.listen(port, () => {
+    logger.info({ port }, 'Worker health check server listening');
+});
+
+// Handle graceful shutdown
+const shutdown = () => {
+    logger.info('Shutting down worker process...');
+    server.close(() => {
+        logger.info('Health check server closed');
+        process.exit(0);
+    });
+};
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
