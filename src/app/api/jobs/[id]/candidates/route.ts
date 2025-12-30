@@ -64,6 +64,39 @@ export async function POST(req: Request, { params }: RouteParams) {
             );
         }
 
+        // Prevent applying to your own job
+        if (job.userId === user.id) {
+            return NextResponse.json(
+                { error: 'You cannot apply to your own job posting' },
+                { status: 400 }
+            );
+        }
+
+        // Check if user is a recruiter (owns any jobs)
+        const userJobs = await db.query.jobs.findFirst({
+            where: eq(jobs.userId, user.id),
+        });
+
+        if (userJobs) {
+            return NextResponse.json(
+                { error: 'Recruiter accounts cannot apply as candidates. Please use a different email to apply.' },
+                { status: 400 }
+            );
+        }
+
+        // Check if user already applied to this job
+        const existingApplication = await db.query.candidates.findFirst({
+            where: eq(candidates.jobId, jobId),
+            columns: { id: true, email: true },
+        });
+
+        if (existingApplication && existingApplication.email === user.email) {
+            return NextResponse.json(
+                { error: 'You have already applied to this job' },
+                { status: 400 }
+            );
+        }
+
         const body = await req.json();
         const { resumeText, resumeUrl, name, email } = body;
 

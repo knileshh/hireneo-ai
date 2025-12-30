@@ -45,7 +45,12 @@ export default function SignupPage() {
         });
 
         if (error) {
-            setError(error.message);
+            // Provide user-friendly error messages
+            if (error.message.includes('already registered') || error.message.includes('already been registered')) {
+                setError('This email is already registered. Please sign in instead, or use a different email.');
+            } else {
+                setError(error.message);
+            }
             setIsLoading(false);
             return;
         }
