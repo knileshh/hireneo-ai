@@ -1,0 +1,42 @@
+# ===============================================
+# Multi-stage Dockerfile for BullMQ Workers
+# Node.js 24 LTS | Optimized for Size & Performance
+# ===============================================
+
+# Stage 1: Dependencies
+FROM node:24-alpine AS deps
+WORKDIR /app
+
+# Install ALL dependencies (including tsx for TypeScript execution)
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# Stage 2: Runner
+FROM node:24-alpine AS runner
+WORKDIR /app
+
+# Set production environment
+ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
+# Create non-root user for security
+RUN addgroup --system --gid 1001 worker && \
+    adduser --system --uid 1001 worker
+
+# Copy dependencies from deps stage
+COPY --from=deps --chown=worker:worker /app/node_modules ./node_modules
+
+# Copy only necessary source files
+COPY --chown=worker:worker package.json ./
+COPY --chown=worker:worker scripts ./scripts
+COPY --chown=worker:worker src/lib ./src/lib
+
+# Switch to non-root user
+USER worker
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+    CMD pgrep -f "worker" > /dev/null || exit 1
+
+# Run the worker with tsx
+CMD ["npx", "tsx", "scripts/worker.ts"]
