@@ -42,6 +42,13 @@ export const env = skipValidation
         // Provide defaults that are critical for build/runtime init even when skipping validation
         LOG_LEVEL: process.env.LOG_LEVEL || 'info',
         NODE_ENV: process.env.NODE_ENV || 'development',
+        // Mock Redis to prevent connection attempts during build
+        UPSTASH_REDIS_URL: process.env.UPSTASH_REDIS_URL || 'redis://mock:6379',
+        REDIS_HOST: process.env.REDIS_HOST || 'mock',
+        REDIS_PORT: process.env.REDIS_PORT ? Number(process.env.REDIS_PORT) : 6379,
+        // Mock keys to satisfy existence checks if any
+        OPENAI_API_KEY: process.env.OPENAI_API_KEY || 'mock_key',
+        RESEND_API_KEY: process.env.RESEND_API_KEY || 'mock_key',
     } as unknown as z.infer<typeof envSchema>
     : envSchema.parse(process.env);
 
