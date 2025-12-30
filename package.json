@@ -25,7 +25,7 @@
     "docker:push:app": "docker push yourusername/hireneo-app:latest",
     "docker:push:worker": "docker push yourusername/hireneo-worker:latest",
     "docker:push": "npm run docker:push:app && npm run docker:push:worker",
-    "prepare": "husky"
+    "prepare": "node -e \"if (process.env.CI !== 'true') require('husky')()\" || true"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.10",

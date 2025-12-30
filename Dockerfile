@@ -12,7 +12,8 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # Install dependencies with production flag
-RUN npm ci --only=production
+# CI=true skips husky prepare script (dev dependency)
+RUN CI=true npm ci --only=production
 
 
 # Stage 2: Builder

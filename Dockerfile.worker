@@ -8,8 +8,9 @@ FROM node:24-alpine AS deps
 WORKDIR /app
 
 # Install ALL dependencies (including tsx for TypeScript execution)
+# CI=true skips husky prepare script
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN CI=true npm ci
 
 # Stage 2: Runner
 FROM node:24-alpine AS runner
