@@ -46,7 +46,7 @@ export default function PublicJobsPage() {
     const { data, isLoading } = useQuery({
         queryKey: ['public-jobs'],
         queryFn: async () => {
-            const res = await fetch('/api/jobs');
+            const res = await fetch('/api/jobs/public');
             if (!res.ok) throw new Error('Failed to fetch jobs');
             return res.json();
         },
