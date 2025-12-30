@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { db } from '@/lib/db';
 import { candidates, jobs } from '@/lib/db/schema';
 import { eq, desc } from 'drizzle-orm';
-import { parseResumeWithAI } from '@/lib/integrations/openai/resume-parser';
+import { parseResume } from '@/lib/integrations/ai/resume-parser';
 import { uploadResume } from '@/lib/supabase/storage';
 import { extractTextFromFile } from '@/lib/utils/file-parser';
 
@@ -78,7 +78,7 @@ export async function POST(req: Request, { params }: RouteParams) {
         let finalResumeUrl = resumeUrl;
 
         // Parse resume using AI
-        const parsedResume = await parseResumeWithAI(finalResumeText);
+        const parsedResume = await parseResume(finalResumeText);
 
         // TODO: Score candidate against job requirements using AI
         // For now, use a simple match score based on skills overlap
@@ -88,9 +88,9 @@ export async function POST(req: Request, { params }: RouteParams) {
         const [newCandidate] = await db.insert(candidates).values({
             jobId,
             userId: user.id,
-            name: name || parsedResume.education[0]?.institution || 'Candidate',
-            email: email || user.email!,
-            phone: null,
+            name: name || parsedResume.name,
+            email: email || parsedResume.email,
+            phone: parsedResume.phone || null,
             resumeUrl: finalResumeUrl,
             parsedResume,
             matchScore,

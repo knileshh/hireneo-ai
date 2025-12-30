@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Loader2, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
-export default function LoginPage() {
+function LoginForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirectTo = searchParams.get('redirectTo') || '/dashboard';
@@ -169,5 +169,17 @@ export default function LoginPage() {
                 </p>
             </Card>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-[#FAFAF9]">
+                <Loader2 className="w-8 h-8 animate-spin text-[#1A3305]" />
+            </div>
+        }>
+            <LoginForm />
+        </Suspense>
     );
 }

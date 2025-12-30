@@ -3,7 +3,7 @@ import { candidateProfiles } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { uploadResume } from '@/lib/supabase/storage';
 import { extractTextFromFile } from '@/lib/utils/file-parser';
-import { parseResumeWithAI } from '@/lib/integrations/openai/resume-parser';
+import { parseResume } from '@/lib/integrations/ai/resume-parser';
 import { logger } from '@/lib/logger';
 
 export class ResumeService {
@@ -30,7 +30,7 @@ export class ResumeService {
         let parsedResume = null;
         try {
             const resumeText = await extractTextFromFile(fileBuffer, fileName);
-            parsedResume = await parseResumeWithAI(resumeText);
+            parsedResume = await parseResume(resumeText);
         } catch (parseError) {
             logger.warn({ userId, error: parseError }, 'Resume parsing failed (non-fatal)');
             // Continue without parsed resume
