@@ -20,12 +20,11 @@ import { env } from '../src/lib/env';
 import { logger } from '../src/lib/logger';
 
 // Determine which Redis connection is being used
-const isUpstash = !!(env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN);
-const redisConnection = isUpstash 
+const isUpstash = !!env.UPSTASH_REDIS_URL;
+const redisConnection = isUpstash
     ? {
         type: 'upstash',
-        host: new URL(env.UPSTASH_REDIS_REST_URL).hostname,
-        port: 6379,
+        url: env.UPSTASH_REDIS_URL,
     }
     : {
         type: 'local',
@@ -35,8 +34,7 @@ const redisConnection = isUpstash
 
 logger.info({
     redisType: redisConnection.type,
-    redisHost: redisConnection.host,
-    redisPort: redisConnection.port,
+    redisConnection: isUpstash ? redisConnection.url : `${redisConnection.host}:${redisConnection.port}`,
     nodeEnv: env.NODE_ENV,
 }, 'Starting all workers');
 

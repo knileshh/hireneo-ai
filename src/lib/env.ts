@@ -12,6 +12,7 @@ const envSchema = z.object({
     // Redis (Upstash or local)
     REDIS_HOST: z.string().default('localhost'),
     REDIS_PORT: z.string().regex(/^\d+$/).transform(Number).default('6379'),
+    UPSTASH_REDIS_URL: z.string().optional(),
     UPSTASH_REDIS_REST_URL: z.string().optional(),
     UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
 

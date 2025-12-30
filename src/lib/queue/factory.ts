@@ -1,19 +1,9 @@
 import { Queue } from 'bullmq';
 import { env } from '@/lib/env';
+import { getRedisConnection } from './connection';
 
-// Use Upstash if configured, otherwise fall back to local Redis
-const connection = env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN
-    ? {
-        // Extract hostname from REST URL (remove https:// and any path)
-        host: new URL(env.UPSTASH_REDIS_REST_URL).hostname,
-        port: 6379, // Upstash standard port with TLS
-        password: env.UPSTASH_REDIS_REST_TOKEN,
-        tls: {}, // Enable TLS for Upstash
-    }
-    : {
-        host: env.REDIS_HOST,
-        port: env.REDIS_PORT,
-    };
+// Use the centralized connection helper for BullMQ
+const connection = getRedisConnection();
 
 // Email job data
 export interface EmailJobData {
