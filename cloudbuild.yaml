@@ -1,0 +1,65 @@
+steps:
+  # ==========================================
+  # 1. Build & Push Next.js App
+  # ==========================================
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-app:latest', '.']
+  
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-app:latest']
+
+  # ==========================================
+  # 2. Build & Push BullMQ Worker
+  # ==========================================
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-f', 'Dockerfile.worker', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-worker:latest', '.']
+  
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-worker:latest']
+
+  # ==========================================
+  # 3. Deploy App to Cloud Run
+  # ==========================================
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'hireneo-app'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-app:latest'
+      - '--region'
+      - 'us-central1'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '3000'
+      - '--memory'
+      - '1Gi'
+
+  # ==========================================
+  # 4. Deploy Worker to Cloud Run
+  # ==========================================
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'hireneo-worker'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-worker:latest'
+      - '--region'
+      - 'us-central1'
+      - '--no-allow-unauthenticated'
+      - '--memory'
+      - '512Mi'
+      - '--min-instances'
+      - '1'
+      # CRITICAL: Worker needs PORT=8080 logic we added to scripts/worker.ts
+      - '--set-env-vars'
+      - 'NODE_ENV=production,PORT=8080'
+
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-app:latest'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-worker:latest'
+
+timeout: 1200s
