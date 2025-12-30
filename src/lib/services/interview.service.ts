@@ -47,7 +47,7 @@ export class InterviewService {
                     jobId: candidate.jobId,
                     candidateName: candidate.name,
                     candidateEmail: candidate.email,
-                    interviewerEmail: 'recruiter@hireneo-ai.xyz', // Default sys email
+                    interviewerEmail: 'recruiter@hireneo-ai.xyz',
                     scheduledAt: new Date(),
                     status: 'SCHEDULED',
                     jobRole: job.title,

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { jobs, candidates } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { logger } from '@/lib/logger';
 
 interface RouteParams {
     params: Promise<{ id: string }>;
@@ -32,7 +33,7 @@ export async function GET(req: Request, { params }: RouteParams) {
 
         return NextResponse.json({ job });
     } catch (error) {
-        console.error('Error fetching job:', error);
+        logger.error({ err: error }, 'Failed to fetch job');
         return NextResponse.json(
             { error: 'Failed to fetch job' },
             { status: 500 }
@@ -72,7 +73,7 @@ export async function PATCH(req: Request, { params }: RouteParams) {
 
         return NextResponse.json({ job: updatedJob });
     } catch (error) {
-        console.error('Error updating job:', error);
+        logger.error({ err: error }, 'Failed to update job');
         return NextResponse.json(
             { error: 'Failed to update job' },
             { status: 500 }
@@ -81,16 +82,13 @@ export async function PATCH(req: Request, { params }: RouteParams) {
 }
 
 /**
- * DELETE /api/jobs/[id] - Delete job and associated candidates
+ * DELETE /api/jobs/[id] - Delete job (candidates cascade deleted via FK)
  */
 export async function DELETE(req: Request, { params }: RouteParams) {
     try {
         const { id } = await params;
 
-        // Delete candidates first (foreign key constraint)
-        await db.delete(candidates).where(eq(candidates.jobId, id));
-
-        // Delete job
+        // Delete job - candidates are cascade deleted via FK constraints
         const [deletedJob] = await db.delete(jobs)
             .where(eq(jobs.id, id))
             .returning();
@@ -102,9 +100,11 @@ export async function DELETE(req: Request, { params }: RouteParams) {
             );
         }
 
+        logger.info({ jobId: id }, 'Job deleted');
+
         return NextResponse.json({ success: true });
     } catch (error) {
-        console.error('Error deleting job:', error);
+        logger.error({ err: error }, 'Failed to delete job');
         return NextResponse.json(
             { error: 'Failed to delete job' },
             { status: 500 }

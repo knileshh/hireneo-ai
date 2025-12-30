@@ -170,15 +170,10 @@ export async function DELETE(
             );
         }
 
-        // Delete related records first (cascade manually since DB constraints might restrict it)
-        await db.delete(interviewQuestions).where(eq(interviewQuestions.interviewId, id));
-        await db.delete(scorecards).where(eq(scorecards.interviewId, id));
-        await db.delete(evaluations).where(eq(evaluations.interviewId, id));
-
-        // Finally delete the interview
+        // Delete interview - related records are cascade deleted via FK constraints
         await db.delete(interviews).where(and(eq(interviews.id, id), eq(interviews.userId, user.id)));
 
-        logger.info({ interviewId: id }, 'Interview and related data deleted');
+        logger.info({ interviewId: id }, 'Interview deleted');
 
         return NextResponse.json({ success: true, id });
 

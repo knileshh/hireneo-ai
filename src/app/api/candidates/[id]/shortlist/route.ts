@@ -6,6 +6,7 @@ import { resendClient } from '@/lib/integrations/resend/client';
 import { createClient } from '@/lib/supabase/server';
 import { generateInterviewQuestions } from '@/lib/integrations/openai/questions';
 import { v4 as uuidv4 } from 'uuid';
+import { logger } from '@/lib/logger';
 
 interface RouteParams {
     params: Promise<{ id: string }>;
@@ -127,7 +128,7 @@ export async function POST(req: Request, { params }: RouteParams) {
                 expiresAt,
             });
         } catch (emailError) {
-            console.error('Failed to send email:', emailError);
+            logger.warn({ candidateId: candidate.id, err: emailError }, 'Failed to send assessment email');
             // Don't fail the whole request if email fails
         }
 
@@ -142,7 +143,7 @@ export async function POST(req: Request, { params }: RouteParams) {
         });
 
     } catch (error) {
-        console.error('Error shortlisting candidate:', error);
+        logger.error({ err: error }, 'Failed to shortlist candidate');
         return NextResponse.json(
             { error: error instanceof Error ? error.message : 'Failed to shortlist candidate' },
             { status: 500 }

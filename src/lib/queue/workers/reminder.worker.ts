@@ -24,8 +24,6 @@ export const reminderWorker = new Worker<ReminderJobData>(
         }, 'Processing reminder job');
 
         try {
-            const timeLabel = reminderType === '24h' ? 'tomorrow' : 'in 1 hour';
-
             // Send reminder email (reusing resend client)
             await resendClient.sendInterviewConfirmation({
                 to: candidateEmail,
