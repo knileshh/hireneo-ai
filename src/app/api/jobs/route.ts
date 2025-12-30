@@ -2,13 +2,22 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { jobs } from '@/lib/db/schema';
 import { eq, desc } from 'drizzle-orm';
+import { createClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/jobs - List all jobs
  */
 export async function GET() {
     try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const allJobs = await db.query.jobs.findMany({
+            where: eq(jobs.userId, user.id),
             orderBy: [desc(jobs.createdAt)],
             with: {
                 candidates: true,
@@ -37,6 +46,13 @@ export async function GET() {
  */
 export async function POST(req: Request) {
     try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const body = await req.json();
 
         const { title, description, requirements, level, department } = body;
@@ -49,6 +65,7 @@ export async function POST(req: Request) {
         }
 
         const [newJob] = await db.insert(jobs).values({
+            userId: user.id,
             title,
             description: description || null,
             requirements: requirements || [],

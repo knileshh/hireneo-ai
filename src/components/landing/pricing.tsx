@@ -17,7 +17,7 @@ export function Pricing() {
         }
 
         if (tierId === 'enterprise') {
-            window.location.href = 'mailto:sales@hireneo.ai?subject=Enterprise Plan Inquiry';
+            window.location.href = 'mailto:sales@hireneo-ai.xyz?subject=Enterprise Plan Inquiry';
             return;
         }
 
@@ -233,7 +233,7 @@ export function Pricing() {
                 </div>
 
                 <div className="text-center mt-12 text-sm text-muted-foreground">
-                    Need a custom enterprise plan with unlimited volume? <a href="mailto:sales@hireneo.ai" className="underline font-medium hover:text-foreground">Talk to us</a>
+                    Need a custom enterprise plan with unlimited volume? <a href="mailto:sales@hireneo-ai.xyz" className="underline font-medium hover:text-foreground">Talk to us</a>
                 </div>
             </div>
         </section>

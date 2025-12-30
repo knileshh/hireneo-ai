@@ -71,8 +71,8 @@ export function Footer() {
                 <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
                     <div className="text-sm">
                         Contact Us{' '}
-                        <a href="mailto:support@hireneo.ai" className="font-bold hover:underline">
-                            support@hireneo.ai
+                        <a href="mailto:support@hireneo-ai.xyz" className="font-bold hover:underline">
+                            support@hireneo-ai.xyz
                         </a>
                     </div>
                     <div className="flex items-center gap-4">

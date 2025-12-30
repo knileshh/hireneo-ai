@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { interviews, interviewQuestions, scorecards, evaluations } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { transitionStatus } from '@/lib/domain/interview-state-machine';
 import { logger } from '@/lib/logger';
+import { createClient } from '@/lib/supabase/server';
 
 const updateInterviewSchema = z.object({
     status: z.enum(['CREATED', 'SCHEDULED', 'COMPLETED', 'EVALUATION_PENDING', 'EVALUATED']).optional(),
@@ -23,9 +24,16 @@ export async function GET(
     const { id } = await params;
 
     try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         // Fetch interview
         const interview = await db.query.interviews.findFirst({
-            where: eq(interviews.id, id),
+            where: and(eq(interviews.id, id), eq(interviews.userId, user.id)),
         });
 
         if (!interview) {
@@ -65,12 +73,19 @@ export async function PATCH(
     const { id } = await params;
 
     try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const body = await req.json();
         const validated = updateInterviewSchema.parse(body);
 
         // Fetch current interview
         const currentInterview = await db.query.interviews.findFirst({
-            where: eq(interviews.id, id),
+            where: and(eq(interviews.id, id), eq(interviews.userId, user.id)),
         });
 
         if (!currentInterview) {
@@ -100,7 +115,7 @@ export async function PATCH(
                 ...validated,
                 updatedAt: new Date(),
             })
-            .where(eq(interviews.id, id))
+            .where(and(eq(interviews.id, id), eq(interviews.userId, user.id)))
             .returning();
 
         logger.info({
@@ -137,8 +152,15 @@ export async function DELETE(
     const { id } = await params;
 
     try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const interview = await db.query.interviews.findFirst({
-            where: eq(interviews.id, id),
+            where: and(eq(interviews.id, id), eq(interviews.userId, user.id)),
         });
 
         if (!interview) {
@@ -154,7 +176,7 @@ export async function DELETE(
         await db.delete(evaluations).where(eq(evaluations.interviewId, id));
 
         // Finally delete the interview
-        await db.delete(interviews).where(eq(interviews.id, id));
+        await db.delete(interviews).where(and(eq(interviews.id, id), eq(interviews.userId, user.id)));
 
         logger.info({ interviewId: id }, 'Interview and related data deleted');
 

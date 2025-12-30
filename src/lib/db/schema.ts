@@ -30,6 +30,7 @@ export const jobs = pgTable('jobs', {
     requirements: jsonb('requirements').$type<string[]>(),
     level: text('level'), // junior, mid, senior, lead
     department: text('department'),
+    userId: text('user_id').notNull(),
     isActive: boolean('is_active').default(true).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull()
@@ -38,7 +39,7 @@ export const jobs = pgTable('jobs', {
 // Interviews table
 export const interviews = pgTable('interviews', {
     id: uuid('id').defaultRandom().primaryKey(),
-    jobId: uuid('job_id').references(() => jobs.id), // Optional job reference
+    jobId: uuid('job_id').references(() => jobs.id, { onDelete: 'cascade' }), // Optional job reference
     candidateName: text('candidate_name').notNull(),
     candidateEmail: text('candidate_email').notNull(),
     interviewerEmail: text('interviewer_email').notNull(),
@@ -48,6 +49,7 @@ export const interviews = pgTable('interviews', {
     notes: text('notes'),
     jobRole: text('job_role'),
     jobLevel: text('job_level'),
+    userId: text('user_id').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull()
 });
@@ -55,7 +57,7 @@ export const interviews = pgTable('interviews', {
 // Assessment tokens - Secure access for candidates
 export const assessmentTokens = pgTable('assessment_tokens', {
     id: uuid('id').defaultRandom().primaryKey(),
-    interviewId: uuid('interview_id').references(() => interviews.id).notNull().unique(),
+    interviewId: uuid('interview_id').references(() => interviews.id, { onDelete: 'cascade' }).notNull().unique(),
     token: text('token').notNull().unique(),
     expiresAt: timestamp('expires_at').notNull(),
     usedAt: timestamp('used_at'), // When candidate started
@@ -66,7 +68,7 @@ export const assessmentTokens = pgTable('assessment_tokens', {
 // Candidate responses - Answers to interview questions
 export const candidateResponses = pgTable('candidate_responses', {
     id: uuid('id').defaultRandom().primaryKey(),
-    interviewId: uuid('interview_id').references(() => interviews.id).notNull(),
+    interviewId: uuid('interview_id').references(() => interviews.id, { onDelete: 'cascade' }).notNull(),
     questionIndex: integer('question_index').notNull(), // Order of question
     question: text('question').notNull(),
     category: questionCategory('category').notNull(),
@@ -84,7 +86,7 @@ export const candidateResponses = pgTable('candidate_responses', {
 // AI-generated interview questions
 export const interviewQuestions = pgTable('interview_questions', {
     id: uuid('id').defaultRandom().primaryKey(),
-    interviewId: uuid('interview_id').references(() => interviews.id).notNull().unique(),
+    interviewId: uuid('interview_id').references(() => interviews.id, { onDelete: 'cascade' }).notNull().unique(),
     jobRole: text('job_role').notNull(),
     jobLevel: text('job_level').notNull(),
     questions: jsonb('questions').notNull().$type<{
@@ -99,7 +101,7 @@ export const interviewQuestions = pgTable('interview_questions', {
 // Interview scorecards (structured evaluation during interview)
 export const scorecards = pgTable('scorecards', {
     id: uuid('id').defaultRandom().primaryKey(),
-    interviewId: uuid('interview_id').references(() => interviews.id).notNull().unique(),
+    interviewId: uuid('interview_id').references(() => interviews.id, { onDelete: 'cascade' }).notNull().unique(),
     technicalScore: integer('technical_score'),
     communicationScore: integer('communication_score'),
     cultureFitScore: integer('culture_fit_score'),
@@ -112,7 +114,7 @@ export const scorecards = pgTable('scorecards', {
 // Evaluations table (AI-generated post-interview)
 export const evaluations = pgTable('evaluations', {
     id: uuid('id').defaultRandom().primaryKey(),
-    interviewId: uuid('interview_id').references(() => interviews.id).notNull().unique(),
+    interviewId: uuid('interview_id').references(() => interviews.id, { onDelete: 'cascade' }).notNull().unique(),
     score: integer('score').notNull(), // 1-10
     summary: text('summary').notNull(),
     strengths: jsonb('strengths').notNull().$type<string[]>(),
@@ -124,7 +126,7 @@ export const evaluations = pgTable('evaluations', {
 // Candidates table - Applicants with parsed resume data and AI scoring
 export const candidates = pgTable('candidates', {
     id: uuid('id').defaultRandom().primaryKey(),
-    jobId: uuid('job_id').references(() => jobs.id).notNull(),
+    jobId: uuid('job_id').references(() => jobs.id, { onDelete: 'cascade' }).notNull(),
     name: text('name').notNull(),
     email: text('email').notNull(),
     phone: text('phone'),
@@ -151,8 +153,10 @@ export const candidates = pgTable('candidates', {
     }>(),
     // Status tracking
     status: text('status').default('NEW').notNull(), // NEW, SHORTLISTED, INVITED, COMPLETED, REJECTED
-    interviewId: uuid('interview_id').references(() => interviews.id), // Link to interview when invited
+
+    interviewId: uuid('interview_id').references(() => interviews.id, { onDelete: 'set null' }), // Link to interview when invited
     invitedAt: timestamp('invited_at'),
+
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull()
 });

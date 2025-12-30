@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { candidates, interviews, assessmentTokens, interviewQuestions, jobs } from '@/lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { resendClient } from '@/lib/integrations/resend/client';
+import { createClient } from '@/lib/supabase/server';
 import { generateInterviewQuestions } from '@/lib/integrations/openai/questions';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -17,6 +18,13 @@ interface RouteParams {
 export async function POST(req: Request, { params }: RouteParams) {
     try {
         const { id: candidateId } = await params;
+
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
 
         // Get candidate with job info
         const candidate = await db.query.candidates.findFirst({
@@ -47,57 +55,67 @@ export async function POST(req: Request, { params }: RouteParams) {
             );
         }
 
-        // Create interview record
-        const [interview] = await db.insert(interviews).values({
-            jobId: candidate.jobId,
-            candidateName: candidate.name,
-            candidateEmail: candidate.email,
-            interviewerEmail: 'recruiter@hireneo.ai', // Default or could be passed in body
-            scheduledAt: new Date(), // Immediate assessment
-            status: 'SCHEDULED',
-            jobRole: candidate.job.title,
-            jobLevel: candidate.job.level || 'mid',
-        }).returning();
+        // Verify ownership via Job
+        if (candidate.job.userId !== user.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
 
-        // Generate unbiased questions tailored to candidate's experience
-        const questionsResult = await generateInterviewQuestions(
-            candidate.job.title,
-            candidate.job.level || 'mid',
-            interview.id
-        );
+        const { assessmentUrl, interview, expiresAt } = await db.transaction(async (tx) => {
+            // Create interview record
+            const [interview] = await tx.insert(interviews).values({
+                userId: user.id,
+                jobId: candidate.jobId,
+                candidateName: candidate.name,
+                candidateEmail: candidate.email,
+                interviewerEmail: user.email || 'recruiter@hireneo-ai.xyz',
+                scheduledAt: new Date(), // Immediate assessment
+                status: 'SCHEDULED',
+                jobRole: candidate.job.title,
+                jobLevel: candidate.job.level || 'mid',
+            }).returning();
 
-        // Save questions
-        await db.insert(interviewQuestions).values({
-            interviewId: interview.id,
-            jobRole: candidate.job.title,
-            jobLevel: candidate.job.level || 'mid',
-            questions: questionsResult.questions,
-        });
+            // Generate unbiased questions tailored to candidate's experience
+            const questionsResult = await generateInterviewQuestions(
+                candidate.job.title,
+                candidate.job.level || 'mid',
+                interview.id
+            );
 
-        // Create assessment token
-        const token = uuidv4();
-        const expiresAt = new Date();
-        expiresAt.setDate(expiresAt.getDate() + 7); // 7 days validity
-
-        await db.insert(assessmentTokens).values({
-            interviewId: interview.id,
-            token,
-            expiresAt,
-        });
-
-        // Update candidate status
-        await db.update(candidates)
-            .set({
-                status: 'INVITED',
+            // Save questions
+            await tx.insert(interviewQuestions).values({
                 interviewId: interview.id,
-                invitedAt: new Date(),
-                updatedAt: new Date(),
-            })
-            .where(eq(candidates.id, candidateId));
+                jobRole: candidate.job.title,
+                jobLevel: candidate.job.level || 'mid',
+                questions: questionsResult.questions,
+            });
 
-        // Build assessment URL
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-        const assessmentUrl = `${baseUrl}/assessment/${token}`;
+            // Create assessment token
+            const token = uuidv4();
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + 7); // 7 days validity
+
+            await tx.insert(assessmentTokens).values({
+                interviewId: interview.id,
+                token,
+                expiresAt,
+            });
+
+            // Update candidate status
+            await tx.update(candidates)
+                .set({
+                    status: 'INVITED',
+                    interviewId: interview.id,
+                    invitedAt: new Date(),
+                    updatedAt: new Date(),
+                })
+                .where(eq(candidates.id, candidateId));
+
+            // Build assessment URL
+            const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+            const assessmentUrl = `${baseUrl}/assessment/${token}`;
+
+            return { assessmentUrl, interview, expiresAt };
+        });
 
         // Send email with assessment link
         try {

@@ -30,7 +30,7 @@ export const reminderWorker = new Worker<ReminderJobData>(
             await resendClient.sendInterviewConfirmation({
                 to: candidateEmail,
                 candidateName,
-                interviewerEmail: 'team@hireneo.ai',
+                interviewerEmail: 'team@hireneo-ai.xyz',
                 scheduledAt: new Date(scheduledAt),
                 meetingLink: undefined,
             });

@@ -1,0 +1,5 @@
+#!/bin/sh
+echo ""
+echo "🐺 [Husky] 🛡️  Running TypeScript Type Check..."
+echo ""
+npx tsc --noEmit

@@ -4,7 +4,8 @@ import { db } from '@/lib/db';
 import { interviews } from '@/lib/db/schema';
 import { emailQueue, EmailJobData } from '@/lib/queue/factory';
 import { logger } from '@/lib/logger';
-import { desc, like, or, count, eq } from 'drizzle-orm';
+import { desc, like, or, count, eq, and } from 'drizzle-orm';
+import { createClient } from '@/lib/supabase/server';
 
 // Validation schemas
 const createInterviewSchema = z.object({
@@ -31,18 +32,27 @@ const listInterviewsSchema = z.object({
  */
 export async function POST(req: NextRequest) {
     try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const body = await req.json();
         const validated = createInterviewSchema.parse(body);
 
         logger.info({
             candidateName: validated.candidateName,
             candidateEmail: validated.candidateEmail,
+            userId: user.id,
         }, 'Creating new interview');
 
         // Insert interview into database
         const [interview] = await db
             .insert(interviews)
             .values({
+                userId: user.id,
                 candidateName: validated.candidateName,
                 candidateEmail: validated.candidateEmail,
                 interviewerEmail: validated.interviewerEmail,
@@ -102,6 +112,13 @@ export async function POST(req: NextRequest) {
  */
 export async function GET(req: NextRequest) {
     try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const { searchParams } = req.url ? new URL(req.url) : { searchParams: new URLSearchParams() };
 
         // Build params object, filtering out null values
@@ -120,33 +137,35 @@ export async function GET(req: NextRequest) {
 
         const offset = (validated.page - 1) * validated.limit;
 
-        // Build query
-        let query = db.select().from(interviews);
+        // Build conditions
+        const conditions = [eq(interviews.userId, user.id)];
 
-        // Apply filters
         if (validated.search) {
-            query = query.where(
-                or(
-                    like(interviews.candidateName, `%${validated.search}%`),
-                    like(interviews.candidateEmail, `%${validated.search}%`)
-                )
-            ) as typeof query;
+            conditions.push(or(
+                like(interviews.candidateName, `%${validated.search}%`),
+                like(interviews.candidateEmail, `%${validated.search}%`)
+            )!);
         }
 
         if (validated.status) {
-            query = query.where(eq(interviews.status, validated.status)) as typeof query;
+            conditions.push(eq(interviews.status, validated.status));
         }
 
         // Execute query with pagination
-        const results = await query
+        const query = db.select()
+            .from(interviews)
+            .where(and(...conditions))
             .orderBy(desc(interviews.createdAt))
             .limit(validated.limit)
             .offset(offset);
 
+        const results = await query;
+
         // Get total count
         const [{ total }] = await db
             .select({ total: count() })
-            .from(interviews);
+            .from(interviews)
+            .where(and(...conditions)!);
 
         return NextResponse.json({
             data: results,

@@ -43,10 +43,11 @@ export class InterviewService {
             try {
                 // 1. Create interview record
                 const [interview] = await db.insert(interviews).values({
+                    userId: job.userId,
                     jobId: candidate.jobId,
                     candidateName: candidate.name,
                     candidateEmail: candidate.email,
-                    interviewerEmail: 'recruiter@hireneo.ai', // Default sys email
+                    interviewerEmail: 'recruiter@hireneo-ai.xyz', // Default sys email
                     scheduledAt: new Date(),
                     status: 'SCHEDULED',
                     jobRole: job.title,
