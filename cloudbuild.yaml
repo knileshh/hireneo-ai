@@ -3,10 +3,10 @@ steps:
   # 1. Build & Push Next.js App
   # ==========================================
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-app:latest', '.']
+    args: ['build', '-t', 'asia-south1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-app:latest', '.']
   
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-app:latest']
+    args: ['push', 'asia-south1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-app:latest']
 
   # ==========================================
   # 2. Build & Push BullMQ Worker
