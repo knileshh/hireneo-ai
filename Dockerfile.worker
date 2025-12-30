@@ -26,10 +26,11 @@ RUN addgroup --system --gid 1001 worker && \
 # Copy dependencies from deps stage
 COPY --from=deps --chown=worker:worker /app/node_modules ./node_modules
 
-# Copy only necessary source files
+# Copy necessary source files
 COPY --chown=worker:worker package.json ./
+COPY --chown=worker:worker tsconfig.json ./
 COPY --chown=worker:worker scripts ./scripts
-COPY --chown=worker:worker src/lib ./src/lib
+COPY --chown=worker:worker src ./src
 
 # Switch to non-root user
 USER worker

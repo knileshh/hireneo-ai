@@ -16,7 +16,15 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "test": "vitest",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "docker:build:app": "docker build -t hireneo-app .",
+    "docker:build:worker": "docker build -f Dockerfile.worker -t hireneo-worker .",
+    "docker:build": "npm run docker:build:app && npm run docker:build:worker",
+    "docker:run:app": "docker run -p 3000:3000 --env-file .env hireneo-app",
+    "docker:run:worker": "docker run --env-file .env hireneo-worker",
+    "docker:push:app": "docker push yourusername/hireneo-app:latest",
+    "docker:push:worker": "docker push yourusername/hireneo-worker:latest",
+    "docker:push": "npm run docker:push:app && npm run docker:push:worker"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.10",

@@ -1,36 +1,45 @@
+version: '3.8'
+
 services:
-  postgres:
-    image: postgres:18.1-alpine
-    container_name: hireneo-postgres
-    restart: unless-stopped
+  # Next.js Application
+  app:
+    image: hireneo-app:latest
+    container_name: hireneo-app
+    ports:
+      - "3000:3000"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: hireneo_ai
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d hireneo_ai" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:8.4-alpine
-    container_name: hireneo-redis
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - UPSTASH_REDIS_URL=${UPSTASH_REDIS_URL}
+      - UPSTASH_REDIS_REST_URL=${UPSTASH_REDIS_REST_URL}
+      - UPSTASH_REDIS_REST_TOKEN=${UPSTASH_REDIS_REST_TOKEN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3000
+    networks:
+      - hireneo-network
     restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 5s
-      timeout: 3s
-      retries: 5
 
-volumes:
-  postgres_data:
-  redis_data:
+  # BullMQ Workers
+  worker:
+    image: hireneo-worker:latest
+    container_name: hireneo-worker
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - UPSTASH_REDIS_URL=${UPSTASH_REDIS_URL}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+    networks:
+      - hireneo-network
+    restart: unless-stopped
+    depends_on:
+      - app
+
+networks:
+  hireneo-network:
+    driver: bridge
