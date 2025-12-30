@@ -37,7 +37,12 @@ const envSchema = z.object({
 const skipValidation = process.env.SKIP_ENV_VALIDATION === '1' || process.env.SKIP_ENV_VALIDATION === 'true';
 
 export const env = skipValidation
-    ? process.env as unknown as z.infer<typeof envSchema>
+    ? {
+        ...process.env,
+        // Provide defaults that are critical for build/runtime init even when skipping validation
+        LOG_LEVEL: process.env.LOG_LEVEL || 'info',
+        NODE_ENV: process.env.NODE_ENV || 'development',
+    } as unknown as z.infer<typeof envSchema>
     : envSchema.parse(process.env);
 
 export type Env = z.infer<typeof envSchema>;
