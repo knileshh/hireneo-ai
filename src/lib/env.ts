@@ -33,6 +33,11 @@ const envSchema = z.object({
 });
 
 // Parse and validate environment variables
-export const env = envSchema.parse(process.env);
+// Skip validation during build (Docker) or if explicitly skipped
+const skipValidation = process.env.SKIP_ENV_VALIDATION === '1' || process.env.SKIP_ENV_VALIDATION === 'true';
+
+export const env = skipValidation
+    ? process.env as unknown as z.infer<typeof envSchema>
+    : envSchema.parse(process.env);
 
 export type Env = z.infer<typeof envSchema>;

@@ -28,6 +28,7 @@ COPY . .
 # Set environment for build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ENV SKIP_ENV_VALIDATION=1
 
 # Increase Node.js memory limit for build
 # Next.js 16 builds can be memory-intensive

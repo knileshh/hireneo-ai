@@ -35,6 +35,8 @@ steps:
       - '3000'
       - '--memory'
       - '1Gi'
+      - '--set-secrets'
+      - 'DATABASE_URL=database-url:latest,UPSTASH_REDIS_URL=upstash-redis-url:latest,OPENAI_API_KEY=openai-api-key:latest,RESEND_API_KEY=resend-api-key:latest,NEXT_PUBLIC_SUPABASE_URL=supabase-url:latest,NEXT_PUBLIC_SUPABASE_ANON_KEY=supabase-anon-key:latest,SUPABASE_SERVICE_ROLE_KEY=supabase-service-key:latest'
 
   # ==========================================
   # 4. Deploy Worker to Cloud Run
@@ -57,6 +59,8 @@ steps:
       # CRITICAL: Worker needs PORT=8080 logic we added to scripts/worker.ts
       - '--set-env-vars'
       - 'NODE_ENV=production,PORT=8080'
+      - '--set-secrets'
+      - 'DATABASE_URL=database-url:latest,UPSTASH_REDIS_URL=upstash-redis-url:latest,OPENAI_API_KEY=openai-api-key:latest,RESEND_API_KEY=resend-api-key:latest,SUPABASE_SERVICE_ROLE_KEY=supabase-service-key:latest'
 
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-app:latest'
