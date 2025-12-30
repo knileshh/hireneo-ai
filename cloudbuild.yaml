@@ -58,7 +58,7 @@ steps:
       - '1'
       # CRITICAL: Worker needs PORT=8080 logic we added to scripts/worker.ts
       - '--set-env-vars'
-      - 'NODE_ENV=production,PORT=8080'
+      - 'NODE_ENV=production'
       - '--set-secrets'
       - 'DATABASE_URL=database-url:latest,UPSTASH_REDIS_URL=upstash-redis-url:latest,OPENAI_API_KEY=openai-api-key:latest,RESEND_API_KEY=resend-api-key:latest,SUPABASE_SERVICE_ROLE_KEY=supabase-service-key:latest'
 
