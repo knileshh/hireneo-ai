@@ -30,11 +30,12 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-  title: 'HireNeo AI - Interview Orchestration',
-  description: 'AI-powered interview management system',
+  metadataBase: new URL('https://hireneo-ai.xyz'),
+  title: 'HireNeo AI | Intelligent Interview Orchestration & ATS',
+  description: 'Revolutionize your hiring with HireNeo AI. Our autonomous agents automate resume screening, scheduling, and first-round interviews, letting you focus on the best talent. The future of efficient recruitment is here.',
   openGraph: {
-    title: 'HireNeo AI - Interview Orchestration',
-    description: 'AI-powered interview management system',
+    title: 'HireNeo AI | Intelligent Interview Orchestration & ATS',
+    description: 'Revolutionize your hiring with HireNeo AI. Our autonomous agents automate resume screening, scheduling, and first-round interviews, letting you focus on the best talent.',
     type: 'website',
   },
 };
