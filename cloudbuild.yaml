@@ -3,6 +3,8 @@ steps:
   # 1. Build & Push Next.js App
   # ==========================================
   - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-app'
+    waitFor: ['-']
     entrypoint: 'sh'
     args:
       - '-c'
@@ -16,21 +18,29 @@ steps:
     secretEnv: ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_ANON_KEY']
   
   - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-app'
+    waitFor: ['build-app']
     args: ['push', 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-app:latest']
 
   # ==========================================
   # 2. Build & Push BullMQ Worker
   # ==========================================
   - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-worker'
+    waitFor: ['-']
     args: ['build', '--cache-from', 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-worker:latest', '-f', 'Dockerfile.worker', '-t', 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-worker:latest', '.']
   
   - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-worker'
+    waitFor: ['build-worker']
     args: ['push', 'asia-southeast1-docker.pkg.dev/$PROJECT_ID/hireneo-repo/hireneo-worker:latest']
 
   # ==========================================
   # 3. Deploy App to Cloud Run
   # ==========================================
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-app'
+    waitFor: ['push-app']
     entrypoint: gcloud
     args:
       - 'run'
@@ -58,6 +68,8 @@ steps:
   # 4. Deploy Worker to Cloud Run
   # ==========================================
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-worker'
+    waitFor: ['push-worker']
     entrypoint: gcloud
     args:
       - 'run'
