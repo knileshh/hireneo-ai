@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { candidates, jobs } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { scoreCandidate } from '@/lib/integrations/ai/resume-parser';
+import { logger } from '@/lib/logger';
 
 interface RouteParams {
     params: Promise<{ id: string }>;
@@ -101,7 +102,7 @@ export async function POST(req: Request, { params }: RouteParams) {
         });
 
     } catch (error) {
-        console.error('Error ranking candidates:', error);
+        logger.error({ err: error }, 'Failed to rank candidates');
         return NextResponse.json(
             { error: 'Failed to rank candidates' },
             { status: 500 }

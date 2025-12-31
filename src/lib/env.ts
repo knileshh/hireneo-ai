@@ -17,7 +17,8 @@ const envSchema = z.object({
     UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
 
     // External APIs
-    OPENAI_API_KEY: z.string().min(1, 'OpenAI API key is required'),
+    // OpenRouter API key (named OPENAI_API_KEY for SDK compatibility)
+    OPENAI_API_KEY: z.string().min(1, 'OpenRouter API key is required'),
     RESEND_API_KEY: z.string().min(1, 'Resend API key is required'),
 
     // Polar.sh

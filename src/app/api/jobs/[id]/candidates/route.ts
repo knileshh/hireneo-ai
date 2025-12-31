@@ -3,9 +3,10 @@ import { createClient } from '@/lib/supabase/server';
 import { db } from '@/lib/db';
 import { candidates, jobs } from '@/lib/db/schema';
 import { eq, desc } from 'drizzle-orm';
-import { parseResume } from '@/lib/integrations/ai/resume-parser';
+import { parseResume, scoreCandidate } from '@/lib/integrations/ai/resume-parser';
 import { uploadResume } from '@/lib/supabase/storage';
 import { extractTextFromFile } from '@/lib/utils/file-parser';
+import { logger } from '@/lib/logger';
 
 interface RouteParams {
     params: Promise<{ id: string }>;
@@ -18,6 +19,28 @@ export async function GET(req: Request, { params }: RouteParams) {
     try {
         const { id: jobId } = await params;
 
+        // Verify user owns the job
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        // Check job ownership
+        const job = await db.query.jobs.findFirst({
+            where: eq(jobs.id, jobId),
+            columns: { id: true, userId: true },
+        });
+
+        if (!job) {
+            return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+        }
+
+        if (job.userId !== user.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const jobCandidates = await db.query.candidates.findMany({
             where: eq(candidates.jobId, jobId),
             orderBy: [desc(candidates.matchScore)],
@@ -25,7 +48,7 @@ export async function GET(req: Request, { params }: RouteParams) {
 
         return NextResponse.json({ candidates: jobCandidates });
     } catch (error) {
-        console.error('Error fetching candidates:', error);
+        logger.error({ err: error }, 'Failed to fetch candidates');
         return NextResponse.json(
             { error: 'Failed to fetch candidates' },
             { status: 500 }
@@ -113,9 +136,13 @@ export async function POST(req: Request, { params }: RouteParams) {
         // Parse resume using AI
         const parsedResume = await parseResume(finalResumeText);
 
-        // TODO: Score candidate against job requirements using AI
-        // For now, use a simple match score based on skills overlap
-        const matchScore = 75; // Placeholder
+        // Score candidate against job requirements using AI
+        const matchAnalysis = await scoreCandidate(
+            parsedResume,
+            job.title,
+            job.requirements || [],
+            job.level || 'mid'
+        );
 
         // Create candidate record
         const [newCandidate] = await db.insert(candidates).values({
@@ -126,11 +153,11 @@ export async function POST(req: Request, { params }: RouteParams) {
             phone: parsedResume.phone || null,
             resumeUrl: finalResumeUrl,
             parsedResume,
-            matchScore,
+            matchScore: matchAnalysis.matchScore,
             matchAnalysis: {
-                strengths: parsedResume.skills.slice(0, 3),
-                gaps: [],
-                recommendation: 'Review this candidate',
+                strengths: matchAnalysis.strengths,
+                gaps: matchAnalysis.gaps,
+                recommendation: matchAnalysis.recommendation,
             },
             status: 'NEW',
         }).returning();
@@ -141,7 +168,7 @@ export async function POST(req: Request, { params }: RouteParams) {
         }, { status: 201 });
 
     } catch (error) {
-        console.error('Error creating candidate:', error);
+        logger.error({ err: error }, 'Failed to create candidate');
         return NextResponse.json(
             { error: error instanceof Error ? error.message : 'Failed to create candidate' },
             { status: 500 }

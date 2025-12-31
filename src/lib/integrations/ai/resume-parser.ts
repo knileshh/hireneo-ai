@@ -1,14 +1,7 @@
 import { generateObject } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
 import { z } from 'zod';
-import { env } from '@/lib/env';
 import { logger } from '@/lib/logger';
-
-// OpenRouter client
-const openrouter = createOpenAI({
-    apiKey: env.OPENAI_API_KEY,
-    baseURL: 'https://openrouter.ai/api/v1',
-});
+import { openrouter, MODEL_CONFIG, TEMPERATURE } from '@/lib/ai/config';
 
 // ============ SCHEMAS ============
 
@@ -56,7 +49,7 @@ export async function parseResume(resumeText: string): Promise<ParsedResume> {
         logger.info('Parsing resume with AI');
 
         const { object } = await generateObject({
-            model: openrouter('anthropic/claude-3.5-haiku'),
+            model: openrouter(MODEL_CONFIG.resumeParsing),
             schema: parsedResumeSchema,
             prompt: `Extract structured information from this resume. Be thorough in identifying skills, experience, and education.
 
@@ -72,7 +65,7 @@ INSTRUCTIONS:
 6. Estimate total years of professional experience
 
 If certain information is not present, provide reasonable defaults or empty arrays.`,
-            temperature: 0.3, // Low temperature for accurate extraction
+            temperature: TEMPERATURE.extraction,
         });
 
         logger.info({ name: object.name }, 'Resume parsed successfully');
@@ -101,7 +94,7 @@ export async function scoreCandidate(
         }, 'Scoring candidate against job');
 
         const { object } = await generateObject({
-            model: openrouter('anthropic/claude-3.5-haiku'),
+            model: openrouter(MODEL_CONFIG.candidateScoring),
             schema: matchAnalysisSchema,
             prompt: `Analyze how well this candidate matches the job requirements. Provide an objective, unbiased assessment.
 
@@ -133,7 +126,7 @@ Focus ONLY on:
 - Skill alignment with requirements
 - Relevant experience level
 - Technical competency signals`,
-            temperature: 0.4,
+            temperature: TEMPERATURE.scoring,
         });
 
         logger.info({

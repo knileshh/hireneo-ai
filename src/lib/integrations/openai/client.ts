@@ -1,14 +1,7 @@
 import { generateObject } from 'ai';
-import { createOpenAI } from '@ai-sdk/openai';
 import { z } from 'zod';
-import { env } from '@/lib/env';
 import { logger } from '@/lib/logger';
-
-// OpenRouter client - use OpenAI-compatible API with OpenRouter base URL
-const openrouter = createOpenAI({
-    apiKey: env.OPENAI_API_KEY,
-    baseURL: 'https://openrouter.ai/api/v1',
-});
+import { openrouter, MODEL_CONFIG, TEMPERATURE } from '@/lib/ai/config';
 
 /**
  * Schema for AI-generated interview evaluation
@@ -45,9 +38,8 @@ export async function generateInterviewEvaluation(
             noteLength: notes.length
         }, 'Starting AI interview evaluation');
 
-        // Use a model available on OpenRouter (e.g., GPT-4o or Claude)
         const { object } = await generateObject({
-            model: openrouter('openai/gpt-4o-mini'),
+            model: openrouter(MODEL_CONFIG.interviewEvaluation),
             schema: evaluationSchema,
             prompt: `You are an expert technical interviewer. Evaluate this interview based on the notes below.
 
@@ -61,7 +53,7 @@ Be objective, constructive, and specific in your evaluation.
 
 Interview Notes:
 ${notes}`,
-            temperature: 0.3 // Lower temperature for more consistent evaluations
+            temperature: TEMPERATURE.extraction,
         });
 
         logger.info({
