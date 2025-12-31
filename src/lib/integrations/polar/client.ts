@@ -8,17 +8,17 @@ if (!process.env.POLAR_ACCESS_TOKEN) {
 // Initialize Polar client
 // Note: Polar.sh uses 'production' for the live environment (not 'sandbox')
 export const polar = new Polar({
-    accessToken: process.env.POLAR_ACCESS_TOKEN,
+    accessToken: process.env.POLAR_ACCESS_TOKEN?.trim(),
 });
 
 // Helper function to get product ID at runtime (not at module load time)
 // This prevents Next.js from caching undefined values during build
 export function getProductId(tier: 'pro' | 'enterprise'): string | undefined {
     if (tier === 'pro') {
-        return process.env.POLAR_PRO_PRODUCT_ID;
+        return process.env.POLAR_PRO_PRODUCT_ID?.trim();
     }
     if (tier === 'enterprise') {
-        return process.env.POLAR_ENTERPRISE_PRODUCT_ID;
+        return process.env.POLAR_ENTERPRISE_PRODUCT_ID?.trim();
     }
     return undefined;
 }
