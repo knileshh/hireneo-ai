@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createCheckoutSession, PRICING_TIERS } from '@/lib/integrations/polar/client';
+import { createCheckoutSession, getProductId } from '@/lib/integrations/polar/client';
 import { createClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const tierConfig = PRICING_TIERS[tier as 'pro' | 'enterprise'];
-        const productId = tierConfig.productId;
+        // Get product ID at runtime (not from cached module-level constant)
+        const productId = getProductId(tier as 'pro' | 'enterprise');
 
         console.log('Creating checkout for:', { tier, productId, email: user.email });
 
@@ -63,12 +63,12 @@ export async function POST(request: NextRequest) {
             response: error?.response?.data,
             stack: error?.stack,
         });
-        
+
         // Return more specific error message
         const errorMessage = error?.body?.error?.message || error?.message || 'Failed to create checkout session';
-        
+
         return NextResponse.json(
-            { 
+            {
                 error: errorMessage,
                 details: error?.body?.error?.detail || 'Please check your Polar configuration and try again',
             },

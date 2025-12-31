@@ -11,6 +11,18 @@ export const polar = new Polar({
     accessToken: process.env.POLAR_ACCESS_TOKEN,
 });
 
+// Helper function to get product ID at runtime (not at module load time)
+// This prevents Next.js from caching undefined values during build
+export function getProductId(tier: 'pro' | 'enterprise'): string | undefined {
+    if (tier === 'pro') {
+        return process.env.POLAR_PRO_PRODUCT_ID;
+    }
+    if (tier === 'enterprise') {
+        return process.env.POLAR_ENTERPRISE_PRODUCT_ID;
+    }
+    return undefined;
+}
+
 // Pricing tiers configuration
 export const PRICING_TIERS = {
     free: {
@@ -30,7 +42,7 @@ export const PRICING_TIERS = {
     pro: {
         name: 'Pro',
         price: 29,
-        productId: process.env.POLAR_PRO_PRODUCT_ID,
+        // productId is fetched at runtime via getProductId('pro')
         features: [
             'Unlimited job postings',
             '100 candidates per month',
@@ -46,7 +58,7 @@ export const PRICING_TIERS = {
     enterprise: {
         name: 'Enterprise',
         price: 99,
-        productId: process.env.POLAR_ENTERPRISE_PRODUCT_ID,
+        // productId is fetched at runtime via getProductId('enterprise')
         features: [
             'Everything in Pro',
             'Unlimited candidates',
@@ -76,9 +88,9 @@ export async function createCheckoutSession({
     successUrl: string;
     metadata?: Record<string, string>;
 }) {
-    console.log('🔵 Calling Polar checkouts.create with:', { 
-        productId, 
-        customerEmail, 
+    console.log('🔵 Calling Polar checkouts.create with:', {
+        productId,
+        customerEmail,
         successUrl,
         metadata,
         hasToken: !!process.env.POLAR_ACCESS_TOKEN,
@@ -136,9 +148,9 @@ export async function hasActiveSubscription(customerEmail: string): Promise<{
 
         // Determine tier based on product
         const productId = activeSubscription.productId;
-        if (productId === PRICING_TIERS.enterprise.productId) {
+        if (productId === getProductId('enterprise')) {
             return { isActive: true, tier: 'enterprise' };
-        } else if (productId === PRICING_TIERS.pro.productId) {
+        } else if (productId === getProductId('pro')) {
             return { isActive: true, tier: 'pro' };
         }
 
