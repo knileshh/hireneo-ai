@@ -14,7 +14,12 @@ const PaperIllustration = ({ className, rotate = 0 }: { className?: string, rota
         className={className}
     >
         <div className="relative w-32 h-40 bg-white rounded-sm shadow-md border border-black/10 p-4 transform rotate-2 hover:-translate-y-2 transition-transform duration-300">
-            <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/lined-paper.png')] opacity-50"></div>
+            <div className="absolute top-0 left-0 w-full h-full opacity-50"
+                style={{
+                    backgroundImage: 'linear-gradient(transparent 95%, #e5e7eb 95%)',
+                    backgroundSize: '100% 24px'
+                }}
+            ></div>
             <div className="space-y-3 pt-2">
                 <div className="h-2 w-3/4 bg-black/10 rounded-full"></div>
                 <div className="h-2 w-full bg-black/10 rounded-full"></div>
@@ -100,6 +105,8 @@ export function Hero() {
                                     src={`https://i.pravatar.cc/150?img=${img}`}
                                     alt="User"
                                     fill
+                                    sizes="32px"
+                                    priority={i < 3}
                                     className="object-cover"
                                 />
                             </div>
