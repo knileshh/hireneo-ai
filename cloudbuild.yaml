@@ -63,7 +63,7 @@ steps:
       - '--memory'
       - '1Gi'
       - '--set-secrets'
-      - 'DATABASE_URL=database-url:latest,UPSTASH_REDIS_URL=upstash-redis-url:latest,OPENAI_API_KEY=openai-api-key:latest,RESEND_API_KEY=resend-api-key:latest,NEXT_PUBLIC_SUPABASE_URL=supabase-url:latest,NEXT_PUBLIC_SUPABASE_ANON_KEY=supabase-anon-key:latest,SUPABASE_SERVICE_ROLE_KEY=supabase-service-key:latest'
+      - 'DATABASE_URL=database-url:latest,UPSTASH_REDIS_URL=upstash-redis-url:latest,OPENAI_API_KEY=openai-api-key:latest,RESEND_API_KEY=resend-api-key:latest,NEXT_PUBLIC_SUPABASE_URL=supabase-url:latest,NEXT_PUBLIC_SUPABASE_ANON_KEY=supabase-anon-key:latest,SUPABASE_SERVICE_ROLE_KEY=supabase-service-key:latest,POLAR_ACCESS_TOKEN=POLAR_ACCESS_TOKEN:latest,POLAR_PRO_PRODUCT_ID=POLAR_PRO_PRODUCT_ID:latest,POLAR_ENTERPRISE_PRODUCT_ID=POLAR_ENTERPRISE_PRODUCT_ID:latest'
 
   # ==========================================
   # 4. Deploy Worker to Cloud Run
