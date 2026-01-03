@@ -1,93 +1,10 @@
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-
-// Sample blog posts content
-const posts: Record<string, { title: string; content: string; date: string; category: string }> = {
-    'getting-started': {
-        title: 'Getting Started with HireNeo AI',
-        date: '2024-12-28',
-        category: 'Guide',
-        content: `
-# Getting Started with HireNeo AI
-
-Welcome to HireNeo AI! This guide will walk you through setting up your first AI-powered interview.
-
-## Step 1: Create Your Account
-
-Sign up for HireNeo AI using your email or Google account. The free tier gives you 5 interviews per month.
-
-## Step 2: Schedule Your First Interview
-
-Click "New Interview" from the dashboard and fill in:
-- Candidate name and email
-- Job role and experience level
-- Interview date and time
-
-## Step 3: Generate AI Questions
-
-Our AI will automatically generate tailored interview questions based on the job role. You can review and customize these questions.
-
-## Step 4: Conduct the Interview
-
-After the interview, fill out the scorecard to rate the candidate across key dimensions:
-- Technical Skills
-- Communication
-- Culture Fit
-- Problem Solving
-
-## Step 5: Get AI Evaluation
-
-Click "Run Evaluation" to generate an AI-powered summary with:
-- Overall score (1-10)
-- Key strengths
-- Potential risks
-- Hiring recommendation
-
-That's it! You're now ready to make data-driven hiring decisions.
-    `,
-    },
-    'ai-hiring-guide': {
-        title: 'The Complete Guide to AI-Powered Hiring',
-        date: '2024-12-25',
-        category: 'AI',
-        content: `
-# The Complete Guide to AI-Powered Hiring
-
-Artificial intelligence is revolutionizing how companies hire. Here's what you need to know.
-
-## What is AI-Powered Hiring?
-
-AI-powered hiring uses machine learning to:
-- Screen resumes at scale
-- Generate interview questions
-- Analyze candidate responses
-- Provide objective evaluations
-
-## Benefits of AI in Hiring
-
-### 1. Reduced Bias
-Structured evaluations help eliminate unconscious bias by focusing on objective criteria.
-
-### 2. Time Savings
-AI can process candidate data in seconds, saving hours of manual review.
-
-### 3. Consistency
-Every candidate is evaluated using the same criteria, ensuring fairness.
-
-### 4. Better Predictions
-AI models can identify patterns that predict job success.
-
-## Best Practices
-
-- Always keep humans in the loop for final decisions
-- Regularly audit your AI for bias
-- Be transparent with candidates about AI use
-- Use AI to augment, not replace, human judgment
-
-The future of hiring is here. Embrace AI while maintaining the human connection.
-    `,
-    },
-};
+import { posts } from '@/lib/blog-data';
+import { NewsletterForm } from '@/components/newsletter-form';
+import { Navbar } from '@/components/landing/navbar';
 
 export default async function BlogPostPage({
     params,
@@ -104,47 +21,61 @@ export default async function BlogPostPage({
     return (
         <div className="min-h-screen bg-background">
             {/* Navigation */}
-            <nav className="border-b py-4 px-4">
-                <div className="max-w-7xl mx-auto flex justify-between items-center">
-                    <Link href="/" className="font-bold text-xl">HireNeo AI</Link>
-                    <div className="flex gap-6 text-sm">
-                        <Link href="/pricing" className="text-muted-foreground hover:text-foreground">Pricing</Link>
-                        <Link href="/blog" className="font-medium">Blog</Link>
-                    </div>
-                </div>
-            </nav>
+            {/* Navigation */}
+            <Navbar />
 
             {/* Article */}
-            <article className="py-12 px-4">
+            <article className="py-20 px-4">
                 <div className="max-w-3xl mx-auto">
-                    <Link href="/blog" className="text-sm text-muted-foreground hover:text-foreground mb-6 inline-block">
-                        ← Back to Blog
+                    <Link href="/blog" className="text-sm text-muted-foreground hover:text-[#1A3305] mb-8 inline-flex items-center group transition-colors">
+                        <span className="group-hover:-translate-x-1 transition-transform">←</span>
+                        <span className="ml-2">Back to Blog</span>
                     </Link>
 
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                        <span className="bg-muted px-2 py-1 rounded">{post.category}</span>
-                        <span>{post.date}</span>
+                    {/* Header */}
+                    <div className="mb-12">
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
+                            <span className="bg-[#1A3305]/5 text-[#1A3305] px-3 py-1 rounded-full font-medium text-xs uppercase tracking-wider">{post.category}</span>
+                            <span>{post.date}</span>
+                            <span>•</span>
+                            <span>{post.readTime}</span>
+                        </div>
+                        <h1 className="text-4xl md:text-5xl font-heading font-extrabold mb-8 leading-tight text-foreground">{post.title}</h1>
+                        <div className="aspect-video w-full rounded-2xl overflow-hidden mb-8 bg-gray-100 shadow-sm">
+                            <img
+                                src={post.imageUrl}
+                                alt={post.title}
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
                     </div>
 
-                    <h1 className="text-4xl font-bold mb-8">{post.title}</h1>
+                    {/* Content */}
+                    <div className="prose prose-lg prose-slate max-w-none prose-headings:font-heading prose-headings:font-bold prose-h1:hidden prose-h2:text-2xl prose-h2:mt-12 prose-h2:mb-6 prose-p:leading-relaxed prose-p:text-gray-600 prose-li:text-gray-600 prose-strong:text-foreground prose-a:text-[#1A3305]">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {post.content}
+                        </ReactMarkdown>
+                    </div>
 
-                    <div className="prose prose-neutral dark:prose-invert max-w-none">
-                        {post.content.split('\n').map((line, i) => {
-                            if (line.startsWith('# ')) return <h1 key={i} className="text-3xl font-bold mt-8 mb-4">{line.slice(2)}</h1>;
-                            if (line.startsWith('## ')) return <h2 key={i} className="text-2xl font-bold mt-6 mb-3">{line.slice(3)}</h2>;
-                            if (line.startsWith('### ')) return <h3 key={i} className="text-xl font-semibold mt-4 mb-2">{line.slice(4)}</h3>;
-                            if (line.startsWith('- ')) return <li key={i} className="ml-4">{line.slice(2)}</li>;
-                            if (line.trim()) return <p key={i} className="my-2 text-muted-foreground">{line}</p>;
-                            return null;
-                        })}
+                    {/* Share/CTA */}
+                    <div className="mt-16 pt-8 border-t border-black/10">
+                        <div className="bg-[#FAFAF9] p-8 rounded-2xl border border-black/5 flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div>
+                                <h3 className="font-bold text-xl mb-2">Enjoyed this article?</h3>
+                                <p className="text-muted-foreground">Subscribe to get more insights like this to your inbox.</p>
+                            </div>
+                            <div className="w-full md:w-auto">
+                                <NewsletterForm />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </article>
 
             {/* Footer */}
-            <footer className="py-8 border-t px-4">
+            <footer className="py-8 border-t px-4 bg-[#FAFAF9]">
                 <div className="max-w-7xl mx-auto text-center text-sm text-muted-foreground">
-                    <p>© 2024 HireNeo AI. All rights reserved.</p>
+                    <p>© 2026 HireNeo AI. All rights reserved.</p>
                 </div>
             </footer>
         </div>

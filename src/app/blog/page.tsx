@@ -1,87 +1,49 @@
 import Link from 'next/link';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-// Static blog posts data (in production, this would come from MDX files or CMS)
-const posts = [
-    {
-        slug: 'getting-started',
-        title: 'Getting Started with HireNeo AI',
-        description: 'Learn how to set up your first AI-powered interview in minutes.',
-        date: '2024-12-28',
-        readTime: '5 min read',
-        category: 'Guide',
-    },
-    {
-        slug: 'ai-hiring-guide',
-        title: 'The Complete Guide to AI-Powered Hiring',
-        description: 'Discover how artificial intelligence is transforming the recruitment landscape.',
-        date: '2024-12-25',
-        readTime: '8 min read',
-        category: 'AI',
-    },
-    {
-        slug: 'interview-best-practices',
-        title: '5 Interview Best Practices for 2025',
-        description: 'Tips from hiring experts on conducting effective interviews.',
-        date: '2024-12-20',
-        readTime: '6 min read',
-        category: 'Tips',
-    },
-    {
-        slug: 'reduce-bias',
-        title: 'How to Reduce Interview Bias with AI',
-        description: 'Structured evaluations help eliminate unconscious bias in hiring.',
-        date: '2024-12-15',
-        readTime: '7 min read',
-        category: 'AI',
-    },
-    {
-        slug: 'why-scorecards-matter',
-        title: 'Why Interview Scorecards Matter',
-        description: 'Building consistent evaluation frameworks for better hiring decisions.',
-        date: '2024-12-10',
-        readTime: '5 min read',
-        category: 'Guide',
-    },
-];
+import { posts } from '@/lib/blog-data';
+import { NewsletterForm } from '@/components/newsletter-form';
+import { Navbar } from '@/components/landing/navbar';
 
 export default function BlogPage() {
+    // Convert posts object to array for mapping
+    const postsList = Object.values(posts).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
     return (
         <div className="min-h-screen bg-background">
             {/* Navigation */}
-            <nav className="border-b py-4 px-4">
-                <div className="max-w-7xl mx-auto flex justify-between items-center">
-                    <Link href="/" className="font-bold text-xl">HireNeo AI</Link>
-                    <div className="flex gap-6 text-sm">
-                        <Link href="/pricing" className="text-muted-foreground hover:text-foreground">Pricing</Link>
-                        <Link href="/blog" className="font-medium">Blog</Link>
-                        <Link href="/sign-in" className="text-muted-foreground hover:text-foreground">Sign In</Link>
-                    </div>
-                </div>
-            </nav>
+            <Navbar />
 
             {/* Blog Header */}
-            <section className="py-12 px-4 text-center border-b">
-                <h1 className="text-4xl font-bold mb-4">Blog</h1>
-                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                    Insights on AI-powered hiring, interview best practices, and building great teams.
+            <section className="py-20 px-4 text-center border-b bg-[#FAFAF9]">
+                <h1 className="text-5xl font-heading font-bold mb-6">Our Blog</h1>
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                    Insights on AI-powered hiring, future of work trends, and strategies for building world-class teams in 2026.
                 </p>
             </section>
 
             {/* Blog Posts */}
-            <section className="py-12 px-4">
-                <div className="max-w-4xl mx-auto grid gap-6">
-                    {posts.map((post) => (
-                        <Link href={`/blog/${post.slug}`} key={post.slug}>
-                            <Card className="hover:border-primary transition-colors cursor-pointer">
-                                <CardHeader>
-                                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
-                                        <span className="bg-muted px-2 py-1 rounded">{post.category}</span>
+            <section className="py-20 px-4">
+                <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {postsList.map((post) => (
+                        <Link href={`/blog/${post.slug}`} key={post.slug} className="group h-full">
+                            <Card className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-all duration-300 border-black/10 group-hover:border-[#1A3305]/50 py-0 gap-0">
+                                <div className="h-56 relative w-full overflow-hidden bg-gray-100">
+                                    <img
+                                        src={post.imageUrl}
+                                        alt={post.title}
+                                        className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                                    />
+                                </div>
+                                <CardHeader className="flex-1 flex flex-col py-6">
+                                    <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wider">
+                                        <span className="text-[#1A3305] bg-[#1A3305]/5 px-2 py-1 rounded-full">{post.category}</span>
+                                        <span>•</span>
                                         <span>{post.date}</span>
+                                        <span>•</span>
                                         <span>{post.readTime}</span>
                                     </div>
-                                    <CardTitle className="text-xl">{post.title}</CardTitle>
-                                    <CardDescription>{post.description}</CardDescription>
+                                    <CardTitle className="text-xl font-bold mb-3 line-clamp-2 leading-tight group-hover:text-[#1A3305] transition-colors">{post.title}</CardTitle>
+                                    <CardDescription className="line-clamp-3 text-sm leading-relaxed">{post.description}</CardDescription>
                                 </CardHeader>
                             </Card>
                         </Link>
@@ -90,29 +52,22 @@ export default function BlogPage() {
             </section>
 
             {/* Newsletter */}
-            <section className="py-12 bg-muted/50 px-4">
+            <section className="py-24 bg-[#1A3305] text-white px-4">
                 <div className="max-w-xl mx-auto text-center">
-                    <h2 className="text-xl font-bold mb-2">Subscribe to our newsletter</h2>
-                    <p className="text-muted-foreground text-sm mb-4">
-                        Get the latest insights on AI hiring delivered to your inbox.
+                    <h2 className="text-3xl font-heading font-bold mb-4">Subscribe to our newsletter</h2>
+                    <p className="text-white/80 mb-8 font-light">
+                        Get the latest insights on AI hiring delivered to your inbox every week.
                     </p>
-                    <div className="flex gap-2 max-w-md mx-auto">
-                        <input
-                            type="email"
-                            placeholder="your@email.com"
-                            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
-                        />
-                        <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium">
-                            Subscribe
-                        </button>
+                    <div className="max-w-md mx-auto">
+                        <NewsletterForm variant="inverted" />
                     </div>
                 </div>
             </section>
 
             {/* Footer */}
-            <footer className="py-8 border-t px-4">
+            <footer className="py-8 border-t px-4 bg-[#FAFAF9]">
                 <div className="max-w-7xl mx-auto text-center text-sm text-muted-foreground">
-                    <p>© 2024 HireNeo AI. All rights reserved.</p>
+                    <p>© 2026 HireNeo AI. All rights reserved.</p>
                 </div>
             </footer>
         </div>
