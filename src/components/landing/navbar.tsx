@@ -25,20 +25,21 @@ export function Navbar() {
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2">
                     <Image
-                        src="/logo-blackline-nobg.png"
+                        src="/logo.png"
                         alt="HireNeo AI"
                         width={40}
                         height={40}
                         className="rounded-lg"
                     />
+                    <span className="font-bold text-lg hidden md:block">HireNeo AI</span>
                 </Link>
 
                 {/* Links - Desktop */}
                 <div className="hidden md:flex items-center gap-8">
-                    {['AI Interview', 'Features', 'For Businesses', 'Pricing'].map((item) => (
+                    {['AI Interview', 'Features', 'Pricing'].map((item) => (
                         <Link
                             key={item}
-                            href={`#${item.toLowerCase().replace(' ', '-')}`}
+                            href={item === 'Blog' ? '/blog' : `/#${item.toLowerCase().replace(' ', '-')}`}
                             className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
                         >
                             {item}
