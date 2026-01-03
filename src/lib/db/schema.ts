@@ -184,6 +184,15 @@ export const candidateProfiles = pgTable('candidate_profiles', {
     updatedAt: timestamp('updated_at').defaultNow().notNull()
 });
 
+// Newsletter subscribers
+export const newsletterSubscribers = pgTable('newsletter_subscribers', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    email: text('email').notNull().unique(),
+    isActive: boolean('is_active').default(true).notNull(),
+    subscribedAt: timestamp('subscribed_at').defaultNow().notNull(),
+    unsubscribedAt: timestamp('unsubscribed_at')
+});
+
 
 // ============ RELATIONS ============
 
@@ -271,4 +280,6 @@ export type Candidate = typeof candidates.$inferSelect;
 export type NewCandidate = typeof candidates.$inferInsert;
 export type CandidateProfile = typeof candidateProfiles.$inferSelect;
 export type NewCandidateProfile = typeof candidateProfiles.$inferInsert;
+export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
+export type NewNewsletterSubscriber = typeof newsletterSubscribers.$inferInsert;
 

@@ -311,6 +311,56 @@ export const resendClient = {
       );
     }
   },
+
+  /**
+   * Send newsletter welcome email
+   */
+  async sendNewsletterWelcome(to: string) {
+    logger.info({ to }, 'Sending newsletter welcome email');
+
+    try {
+      const fromAddress = 'HireNeo AI <noreply@hireneo-ai.xyz>';
+
+      const result = await resend.emails.send({
+        from: fromAddress,
+        to: [to],
+        subject: 'Welcome to the HireNeo AI Newsletter! 📰',
+        html: generateNewsletterWelcomeHtml(to),
+      });
+
+      if (result.error) {
+        throw new ResendError(
+          result.error.message,
+          undefined,
+          result.error
+        );
+      }
+
+      logger.info({
+        emailId: result.data?.id,
+        to,
+      }, 'Newsletter welcome email sent successfully');
+
+      return result;
+
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logger.error({
+        to,
+        error: errorMessage,
+      }, 'Failed to send newsletter welcome email');
+
+      if (error instanceof ResendError) {
+        throw error;
+      }
+
+      throw new ResendError(
+        `Failed to send newsletter welcome email: ${errorMessage}`,
+        500,
+        error
+      );
+    }
+  },
 };
 
 /**
@@ -612,6 +662,57 @@ function generateNewJobEmailHtml(params: {
           <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
             <p style="font-size: 14px; color: #94a3b8; margin: 0;">
               Good luck! 🍀<br/>
+              The <strong style="color: #1A3305;">HireNeo AI</strong> Team
+            </p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+}
+
+/**
+ * Generate HTML template for newsletter welcome email
+ */
+function generateNewsletterWelcomeHtml(email: string): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Welcome to Our Newsletter</title>
+      </head>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #FAFAF9;">
+        <div style="background: linear-gradient(135deg, #1A3305 0%, #2D5A0A 100%); padding: 40px 30px; border-radius: 12px 12px 0 0; text-align: center;">
+          <div style="width: 64px; height: 64px; background: white; border-radius: 16px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 32px;">📰</div>
+          <h1 style="color: white; margin: 0; font-size: 28px; font-weight: bold;">You're Subscribed!</h1>
+          <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 16px;">Welcome to the HireNeo AI community</p>
+        </div>
+        
+        <div style="background: white; padding: 40px 30px; border-radius: 0 0 12px 12px; border: 1px solid #e2e8f0; border-top: none;">
+          <p style="font-size: 16px; color: #334155; margin-top: 0;">Hello,</p>
+          <p style="font-size: 16px; color: #334155;">
+            Thanks for subscribing to our newsletter! We're thrilled to have you join our community of forward-thinking recruiters and candidates.
+          </p>
+          
+          <div style="background: #ECFDF5; padding: 24px; border-radius: 12px; margin: 24px 0; border: 1px solid rgba(26, 51, 5, 0.1);">
+            <p style="margin: 0 0 10px 0; color: #1A3305; font-size: 15px; font-weight: 600;">What to expect:</p>
+            <ul style="margin: 0; padding-left: 20px; color: #0f172a; font-size: 15px; line-height: 1.6;">
+              <li>Latest trends in AI recruitment</li>
+              <li>Tips for better interviewing</li>
+              <li>Product updates and features</li>
+              <li>Exclusive community insights</li>
+            </ul>
+          </div>
+          
+          <p style="font-size: 14px; color: #64748b; margin-top: 32px;">
+            If you ever wish to unsubscribe, you can do so by replying to this email.
+          </p>
+          
+          <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
+            <p style="font-size: 14px; color: #94a3b8; margin: 0;">
+              Best regards,<br/>
               The <strong style="color: #1A3305;">HireNeo AI</strong> Team
             </p>
           </div>
